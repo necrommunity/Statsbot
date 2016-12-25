@@ -18,6 +18,12 @@ namespace ToofzBot
             File.WriteAllText(@"Config.json", JsonConvert.SerializeObject(config, Formatting.Indented));
         }
 
+        public Config()
+        {
+            SteamKey = "";
+            DiscordToken = "";
+        }
+
         public static Config ReadConfig()
         {
             if (!File.Exists(@"Config.json"))
