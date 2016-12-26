@@ -34,7 +34,7 @@ namespace ToofzBot
             {
                 x.AllowMentionPrefix = true;
                 x.PrefixChar = '.';
-                x.HelpMode = HelpMode.Public;
+                //x.HelpMode = HelpMode.Public;
             });
 
             CreateCommands();
@@ -56,30 +56,19 @@ namespace ToofzBot
         {
             var cService = client.GetService<CommandService>();
 
-            cService.CreateCommand("ping")
-                .Description("Returns 'pong'.")
+            cService.CreateCommand("toofz")
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    var toReturn = "pong" + e.GetArg(0);
-                    await e.Channel.SendMessage(toReturn);
+                    var toReturn = CommandHandler.ToofzCommand(e.GetArg(0));
+                    await e.Channel.SendMessage("```" + toReturn + "```");
                 });
-
-            cService.CreateCommand("search")
-                .Description("```Searches for a player. Type \".search <name>\" to see a list of results, \".search <name>: <category>\" to see results for a specific run.\nSteamID can be used instead of a name ( for example:  \".search #245356: seeded score\" ).```")
+            cService.CreateCommand("help")
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    var toReturn = CommandHandler.SearchName(e.GetArg(0));
-                    await e.Channel.SendMessage(toReturn);
-                });
-            cService.CreateCommand("leaderboard")
-                .Description("Displays a leaderboard. The format is \".leaderboard <character>: <category>.  Add &<rank> to see the result from the specified offset.")
-                .Parameter("arg", ParameterType.Unparsed)
-                .Do(async (e) =>
-                {
-                    var toReturn = CommandHandler.SearchLeaderboard(e.GetArg(0));
-                    await e.Channel.SendMessage(toReturn);
+                    var toReturn = CommandHandler.ToofzCommand("help");
+                    await e.Channel.SendMessage("```" + toReturn + "```");
                 });
             //cService.CreateCommand("test")
             //    .Description("aaa.")

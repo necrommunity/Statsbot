@@ -38,29 +38,6 @@ namespace ToofzBot
             return (JsonConvert.DeserializeObject<Leaderboard[]>(File.ReadAllText(@"Leaderboards.json")));
         }
 
-        #region Using "Leaderboards" class
-
-        //public static void RegisterLeaderboards()
-        //{
-        //    Leaderboard[] response = ServerGet<Leaderboard[]>("leaderboards/primaries");
-        //    Leaderboards boards = new Leaderboards(response);
-
-        //    File.WriteAllText(@"Leaderboards.json", JsonConvert.SerializeObject(boards, Formatting.Indented));
-        //    Console.WriteLine("[Leaderboards registered to Leaderboards.json]");
-        //}
-
-        //public static Leaderboards GetLeaderboards()
-        //{
-        //    if (!File.Exists(@"Leaderboards.json"))
-        //    {
-        //        RegisterLeaderboards();
-        //    }
-        //    return (JsonConvert.DeserializeObject<Leaderboards>(File.ReadAllText(@"Leaderboards.json")));
-        //}
-
-        #endregion
-
-
         public static PlayerResults GetPlayers(string q)
         {
             return (ServerGet<PlayerResults>("players?q=" + q));
