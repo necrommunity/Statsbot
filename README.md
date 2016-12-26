@@ -1,5 +1,5 @@
 # ToofzBot
-Discord bot written in C# which fetches stats from the Toofz API.
+Discord bot written in C#. Fetches and formats Crypt of the Necrodancer stats from http://api.toofz.com/.
 
 ###To do list:
 - ~~Character specific searches.~~ Hard to execute and not neccesary atm.
