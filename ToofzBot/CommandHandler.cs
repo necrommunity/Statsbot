@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using System.Text.RegularExpressions;
 
 namespace ToofzBot
 {
@@ -62,9 +63,38 @@ namespace ToofzBot
 
         }
 
+        public static string ToofzCommand(string q)
+        {
+            string str = q.Split(new[] { ' ' })[0];
+            switch (str)
+            {
+                case "search":
+                    q = Regex.Replace(q, "search ", string.Empty, RegexOptions.Multiline);
+                    return (SearchName(q));
+                case "leaderboard":
+                    q = Regex.Replace(q, "leaderboard ", string.Empty, RegexOptions.Multiline);
+                    return (SearchName(q));
+                case "help":
+                    q = Regex.Replace(q, "help ", string.Empty, RegexOptions.Multiline);
+                    if(q.StartsWith("search"))
+                        return("Searches for a player."
+                            +"\nType \".toofz search <name>\" to see a list of search results, or \".toofz search <name>: <category>\" to see results for a specific category."
+                            +"\nSteamID can be used instead of a name (\".toofz search #245356: seeded score\").");
+                    if (q.StartsWith("leaderboard"))
+                        return ("Displays a leaderboard."
+                            +"\nType \".toofz leaderboard <character>: <category>\" to see a leaderboard."
+                            +"\nAdd \"&<rank>\" or \"offset=<rank>\" to see the result starting at the specified offset.");
+                    return ("ToofzBot is a bot which retrieves Crypt of the Necrodancer player stats."
+                        +"\n\tAvailable commands: \"search\", \"leaderboard\"."
+                        +"\nUse \"search\", \"leaderboard\", or \"help <command>\" for more information.");
+                default:
+                    return ("Unknown command. Use \"search\", \"leaderboard\", or \"help <command>\" for more information.");
+            }           
+        }
+
         public static string SearchName(string q)
         {
-            string str = "```\n";
+            string str = "";
             bool isID = q.StartsWith("#");
             if (isID)
                 q = q.Trim(new[] { '#' });
@@ -74,7 +104,7 @@ namespace ToofzBot
                 PlayerResults players = ApiSender.GetPlayers(q);
 
                 if (players.Entries.GetLength(0) == 0)
-                    return ("```No results found for the name \"" + q + "\".```");
+                    return ("No results found for the name \"" + q + "\".");
 
                 str += "Displaying top results for the name \"" + q + "\"\n\n";
                 for (int i = 0; i < players.Entries.GetLength(0) && i < 5; i++)
@@ -85,7 +115,6 @@ namespace ToofzBot
                     str += "\tEntry count: " + player.EntryCount + "\n";
                     str += "\tBest entry: " + player.BestEntry.Title + " / " + player.BestEntry.Rank + "\n";
                 }
-                str += "```";
                 return str;
             }
 
@@ -108,12 +137,12 @@ namespace ToofzBot
 
             PlayerResults results = ApiSender.GetPlayers(name);
             if (results.Entries.GetLength(0) == 0)
-                return ("```Couldn't find results for the name \"" + name + "\".```");
+                return ("Couldn't find results for the name \"" + name + "\".");
 
             PlayerResult player = results.Entries[0];
             Player idp = ApiSender.GetPlayersId(player.SteamId);
 
-            string str = "```";
+            string str = "";
             foreach (PlayerRun pr in idp.Runs)
             {
                 if (type.Equals(pr.Run.DisplayName, StringComparison.OrdinalIgnoreCase))
@@ -127,22 +156,21 @@ namespace ToofzBot
                             + " - " + ScoreToString(e.Score, pr.Run.Kind, e.Character)
                             + " / " + e.Rank + "\n";
                     }
-                    str += "```";
                     return str;
                 }
             }
-            return ("```Couldn't find results in the catagory \"" + type + "\".```");
+            return ("Couldn't find results in the catagory \"" + type + "\".");
         }
 
         public static string SearchId(string id, string type)
         {
             SteamUser user = ApiSender.GetSteamUser(id);
             if (user == null)
-                return ("```Couldn't find results for the steamID \"" + id + "\".```");
+                return ("Couldn't find results for the steamID \"" + id + "\".");
 
             Player idp = ApiSender.GetPlayersId(id.ToString());
 
-            string str = "```";
+            string str = "";
             foreach (PlayerRun pr in idp.Runs)
             {
                 if (type.Equals(pr.Run.DisplayName, StringComparison.OrdinalIgnoreCase))
@@ -156,7 +184,6 @@ namespace ToofzBot
                             + " - " + ScoreToString(e.Score, pr.Run.Kind, e.Character)
                             + " / " + e.Rank + "\n";
                     }
-                    str += "```";
                     return str;
                 }
             }
@@ -167,7 +194,7 @@ namespace ToofzBot
         {
 
             if (!q.Contains(":"))
-                return ("```Please enter a specific leaderboard in the form of \"-leaderboard <character>: <type> &<offset>\". The offset isn't required.```");
+                return ("Please enter a specific leaderboard in the form of \"-leaderboard <character>: <type> &<offset>\".");
 
             string character = q.Split(new[] { ':' })[0];
             string type = q.Split(new[] { ':' })[1];
@@ -182,6 +209,13 @@ namespace ToofzBot
                 type = type.TrimEnd(new[] { ' ' });
             }
 
+            if (q.Contains("offset="))
+            {
+                int.TryParse(q.Split(new[] { "offset=" }, StringSplitOptions.None)[1], out offset);
+                type = type.Split(new[] { "offset=" }, StringSplitOptions.None)[0];
+                type = type.TrimEnd(new[] { ' ' });
+            }
+
             Leaderboard[] boards = ApiSender.GetLeaderboards();
             foreach (Leaderboard b in boards)
             {
@@ -193,11 +227,11 @@ namespace ToofzBot
             }
 
             if (lb == null)
-                return ("```Please enter a valid leaderboard.```");
+                return ("Please enter a valid leaderboard.");
 
             LeaderBoardEntries leaderboard = ApiSender.GetLeaderboardEntries(lb.LeaderboardId, offset);
 
-            string str = "```\n";
+            string str = "";
             Entry en = null;
 
             str += "Displaying leaderboard results for " + lb.Character + " / " + lb.Run + " ( offset = " + offset + " )\n\n";
@@ -208,9 +242,8 @@ namespace ToofzBot
             }
 
             if (en == null)
-                return ("```No results found for " + lb.Character + " / " + lb.Run + " ( offset = " + offset + " ).```");
+                return ("No results found for " + lb.Character + " / " + lb.Run + " ( offset = " + offset + " ).");
 
-            str += "```";
             return str;
         }
 
