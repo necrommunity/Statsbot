@@ -47,7 +47,7 @@ namespace ToofzBot
         {
             return (ServerGet<Player>("players/" + steamId));
         }
-        
+
         public static LeaderBoardEntries GetLeaderboardEntries(int lbId, int offset)
         {
             string lboard = "leaderboards/" + lbId + "/entries?offset=" + offset;
@@ -60,9 +60,11 @@ namespace ToofzBot
             string response;
             using (WebClient client = new WebClient())
             {
-                response = client.DownloadString("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" + Program.config.SteamKey +"&steamids=" + id);
+                response = client.DownloadString("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" + Program.config.SteamKey + "&steamids=" + id);
             }
             users = JsonConvert.DeserializeObject<SteamResponse>(response);
+            if (users.Response.Players.Length == 0)
+                return (new SteamUser());
             return users.Response.Players[0];
         }
     }
