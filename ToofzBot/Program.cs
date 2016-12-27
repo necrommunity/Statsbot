@@ -25,9 +25,9 @@ namespace ToofzBot
 
             client = new DiscordClient(x =>
             {
-                    x.AppName = "ToofzBot";
-                    x.LogLevel = LogSeverity.Info;
-                    x.LogHandler = Log;
+                x.AppName = "ToofzBot";
+                x.LogLevel = LogSeverity.Info;
+                x.LogHandler = Log;
             });
 
             client.UsingCommands(x =>

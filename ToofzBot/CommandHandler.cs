@@ -13,6 +13,11 @@ namespace ToofzBot
     public static class CommandHandler
     {
 
+        public static int Digits(int i)
+        {
+            return (int)Math.Floor(Math.Log10(i) + 1);
+        }
+
         public static int FlipZone(int i)
         {
             switch (i)
@@ -46,7 +51,7 @@ namespace ToofzBot
 
                     score = 100000000 - score;
                     TimeSpan t = TimeSpan.FromMilliseconds(score);
-                    if (character.Equals("All") || character.Equals("Story"))
+                    if (score >= 3600000)
                         return (t.ToString(@"h\:mm\:ss\.ff"));
                     return (t.ToString(@"mm\:ss\.ff"));
 
@@ -66,6 +71,8 @@ namespace ToofzBot
         public static string ToofzCommand(string q)
         {
             string str = q.Split(new[] { ' ' })[0];
+            if (q.Contains("penguin"))
+                return ("@ᕕ(' >')ᕗᕕ(' >')ᕗᕕ(' >')ᕗ" + "\npls no bulli");
             switch (str)
             {
                 case "search":
@@ -73,23 +80,23 @@ namespace ToofzBot
                     return (SearchName(q));
                 case "leaderboard":
                     q = Regex.Replace(q, "leaderboard ", string.Empty, RegexOptions.Multiline);
-                    return (SearchName(q));
+                    return (SearchLeaderboard(q));
                 case "help":
                     q = Regex.Replace(q, "help ", string.Empty, RegexOptions.Multiline);
-                    if(q.StartsWith("search"))
-                        return("Searches for a player."
-                            +"\nType \".toofz search <name>\" to see a list of search results, or \".toofz search <name>: <category>\" to see results for a specific category."
-                            +"\nSteamID can be used instead of a name (\".toofz search #245356: seeded score\").");
+                    if (q.StartsWith("search"))
+                        return ("Searches for a player."
+                            + "\nType \".toofz search <name>\" to see a list of search results, or \".toofz search <name>: <category>\" to see results for a specific category."
+                            + "\nSteamID can be used instead of a name (\".toofz search #245356: seeded score\").");
                     if (q.StartsWith("leaderboard"))
                         return ("Displays a leaderboard."
-                            +"\nType \".toofz leaderboard <character>: <category>\" to see a leaderboard."
-                            +"\nAdd \"&<rank>\" or \"offset=<rank>\" to see the result starting at the specified offset.");
+                            + "\nType \".toofz leaderboard <character>: <category>\" to see a leaderboard."
+                            + "\nAdd \"&<rank>\" or \"offset=<rank>\" to see the result starting at the specified offset.");
                     return ("ToofzBot is a bot which retrieves Crypt of the Necrodancer player stats."
-                        +"\n\tAvailable commands: \"search\", \"leaderboard\"."
-                        +"\nUse \"search\", \"leaderboard\", or \"help <command>\" for more information.");
+                        + "\n\tAvailable commands: \"search\", \"leaderboard\"."
+                        + "\nUse \"search\", \"leaderboard\", or \"help <command>\" for more information.");
                 default:
                     return ("Unknown command. Use \"search\", \"leaderboard\", or \"help <command>\" for more information.");
-            }           
+            }
         }
 
         public static string SearchName(string q)
@@ -143,6 +150,8 @@ namespace ToofzBot
             Player idp = ApiSender.GetPlayersId(player.SteamId);
 
             string str = "";
+            int digitS = Digits(idp.Runs[0].Entries[0].Score);
+
             foreach (PlayerRun pr in idp.Runs)
             {
                 if (type.Equals(pr.Run.DisplayName, StringComparison.OrdinalIgnoreCase))
@@ -152,14 +161,31 @@ namespace ToofzBot
                     str += "Top " + pr.Run.DisplayName + " results\n";
                     foreach (PlayerEntry e in pr.Entries)
                     {
-                        str += "\t" + e.Character
-                            + " - " + ScoreToString(e.Score, pr.Run.Kind, e.Character)
-                            + " / " + e.Rank + "\n";
+                        str += "\t" + e.Character;
+                        for (int i = e.Character.Length; i < 7; i++)
+                        {
+                            str += " ";
+                        }
+
+                        if (pr.Run.Kind == "speed")
+                        {
+                            if ((100000000 - e.Score) < 3600000)
+                                str += "  ";
+                        }
+                        else
+                        {
+                            for (int d = Digits(e.Score); d < digitS; d++)
+                            {
+                                str += " ";
+                            }
+                        }
+                        str += "\t" + ScoreToString(e.Score, pr.Run.Kind, e.Character)
+                                + " / " + e.Rank + "\n";
                     }
                     return str;
                 }
             }
-            return ("Couldn't find results in the catagory \"" + type + "\".");
+            return ("No entries found for the player \"" + player.Name + "\" in the category " + type + ".");
         }
 
         public static string SearchId(string id, string type)
@@ -171,6 +197,8 @@ namespace ToofzBot
             Player idp = ApiSender.GetPlayersId(id.ToString());
 
             string str = "";
+            int digitS = Digits(idp.Runs[0].Entries[0].Score);
+
             foreach (PlayerRun pr in idp.Runs)
             {
                 if (type.Equals(pr.Run.DisplayName, StringComparison.OrdinalIgnoreCase))
@@ -180,14 +208,23 @@ namespace ToofzBot
                     str += "Top " + pr.Run.DisplayName + " results\n";
                     foreach (PlayerEntry e in pr.Entries)
                     {
-                        str += "\t" + e.Character
-                            + " - " + ScoreToString(e.Score, pr.Run.Kind, e.Character)
+                        str += "\t" + e.Character;
+                        for (int i = e.Character.Length; i < 7; i++)
+                        {
+                            str += " ";
+                        }
+
+                        for (int d = Digits(e.Score); d < digitS; d++)
+                        {
+                            str += " ";
+                        }
+                        str += "\t" + ScoreToString(e.Score, pr.Run.Kind, e.Character)
                             + " / " + e.Rank + "\n";
                     }
                     return str;
                 }
             }
-            return ("`No entries found for steamID " + id + " in the catagory " + type + ".`");
+            return ("No entries found for steamID " + id + " in the category " + type + ".");
         }
 
         public static string SearchLeaderboard(string q)
@@ -232,23 +269,52 @@ namespace ToofzBot
             LeaderBoardEntries leaderboard = ApiSender.GetLeaderboardEntries(lb.LeaderboardId, offset);
 
             string str = "";
+            int digitR = Digits(offset + 15);
+            int digitS = Digits(leaderboard.Entries[0].Score);
+
+            if (lb.Run == "Speed" || lb.Run == "Seeded Speed")
+            {
+                if ((100000000 - leaderboard.Entries[15].Score) > 3600000)
+                    digitS = 7;
+                else
+                    digitS = 6;
+            }
+
             Entry en = null;
 
             str += "Displaying leaderboard results for " + lb.Character + " / " + lb.Run + " ( offset = " + offset + " )\n\n";
             for (int i = offset; i < (leaderboard.Entries.GetLength(0) + offset) && i < (offset + 15); i++)
             {
+
                 en = leaderboard.Entries[i - offset];
-                str += en.Rank + ". \t" + ScoreToString(en.Score, type, lb.Character) + "\t" + en.Player + "\n";
+
+                if (Digits(en.Rank) < digitR)
+                    str += "0";
+                str += en.Rank + ". \t";
+
+                if (lb.Run == "Speed" || lb.Run == "Seeded speed")
+                {
+                    if (digitS == 7 && (100000000 - en.Score) < 3600000)
+                        str += "  ";
+                }
+
+                else
+                {
+                    for (int d = Digits(en.Score); d < digitS; d++)
+                    {
+                        str += " ";
+                    }
+                }
+                str += ScoreToString(en.Score, type, lb.Character);
+                str += "\t" + en.Player + "\n";
             }
 
             if (en == null)
-                return ("No results found for " + lb.Character + " / " + lb.Run + " ( offset = " + offset + " ).");
+                return ("No entries found for " + lb.Character + " / " + lb.Run + " ( offset = " + offset + " ).");
 
             return str;
         }
 
-
     }
-
 
 }
