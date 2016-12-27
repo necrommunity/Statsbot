@@ -150,6 +150,7 @@ namespace ToofzBot
             Player idp = ApiSender.GetPlayersId(player.SteamId);
 
             string str = "";
+            int digitS = Digits(idp.Runs[0].Entries[0].Score);
 
             foreach (PlayerRun pr in idp.Runs)
             {
