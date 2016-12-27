@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace ToofzBot
 {
-   
+
     public class SteamUser
     {
         public string Steamid { get; set; }
         public string Personaname { get; set; }
+
+        public SteamUser() { this.Steamid = "error"; }
     }
 
     public class SteamUsers

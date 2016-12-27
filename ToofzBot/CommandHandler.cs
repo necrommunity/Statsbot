@@ -191,7 +191,7 @@ namespace ToofzBot
         public static string SearchId(string id, string type)
         {
             SteamUser user = ApiSender.GetSteamUser(id);
-            if (user == null)
+            if (user.Steamid == "error")
                 return ("Couldn't find results for the steamID \"" + id + "\".");
 
             Player idp = ApiSender.GetPlayersId(id.ToString());
@@ -214,12 +214,20 @@ namespace ToofzBot
                             str += " ";
                         }
 
-                        for (int d = Digits(e.Score); d < digitS; d++)
+                        if (pr.Run.Kind == "speed")
                         {
-                            str += " ";
+                            if ((100000000 - e.Score) < 3600000)
+                                str += "  ";
+                        }
+                        else
+                        {
+                            for (int d = Digits(e.Score); d < digitS; d++)
+                            {
+                                str += " ";
+                            }
                         }
                         str += "\t" + ScoreToString(e.Score, pr.Run.Kind, e.Character)
-                            + " / " + e.Rank + "\n";
+                                + " / " + e.Rank + "\n";
                     }
                     return str;
                 }
