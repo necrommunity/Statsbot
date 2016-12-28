@@ -73,6 +73,8 @@ namespace ToofzBot
             string str = q.Split(new[] { ' ' })[0];
             if (q.Contains("penguin"))
                 return ("@ᕕ(' >')ᕗᕕ(' >')ᕗᕕ(' >')ᕗ" + "\npls no bulli");
+            if (q.Contains("​")) //invisible space
+                q = Regex.Replace(q, ("​"), string.Empty, RegexOptions.Multiline);
             switch (str)
             {
                 case "search":
@@ -172,6 +174,8 @@ namespace ToofzBot
                             if ((100000000 - e.Score) < 3600000)
                                 str += "  ";
                         }
+                        if (pr.Run.Kind == "deathless" && e.Score < 100)
+                            str += " ";
                         else
                         {
                             for (int d = Digits(e.Score); d < digitS; d++)
@@ -219,6 +223,8 @@ namespace ToofzBot
                             if ((100000000 - e.Score) < 3600000)
                                 str += "  ";
                         }
+                        if (pr.Run.Kind == "deathless" && e.Score < 100)
+                            str += " ";
                         else
                         {
                             for (int d = Digits(e.Score); d < digitS; d++)
@@ -254,10 +260,11 @@ namespace ToofzBot
                 type = type.TrimEnd(new[] { ' ' });
             }
 
-            if (q.Contains("offset="))
+            if (q.Contains("offset"))
             {
-                int.TryParse(q.Split(new[] { "offset=" }, StringSplitOptions.None)[1], out offset);
-                type = type.Split(new[] { "offset=" }, StringSplitOptions.None)[0];
+                q = Regex.Replace(q, "=", string.Empty, RegexOptions.Multiline);
+                int.TryParse(q.Split(new[] { "offset" }, StringSplitOptions.None)[1], out offset);
+                type = type.Split(new[] { "offset" }, StringSplitOptions.None)[0];
                 type = type.TrimEnd(new[] { ' ' });
             }
 
@@ -278,6 +285,8 @@ namespace ToofzBot
 
             string str = "";
             int digitR = Digits(offset + 15);
+            if (leaderboard.Entries.Length == 0)
+                return ("No entries found for " + lb.Character + " / " + lb.Run + " ( offset = " + offset + " ).");
             int digitS = Digits(leaderboard.Entries[0].Score);
 
             if (lb.Run == "Speed" || lb.Run == "Seeded Speed")
@@ -305,7 +314,6 @@ namespace ToofzBot
                     if (digitS == 7 && (100000000 - en.Score) < 3600000)
                         str += "  ";
                 }
-
                 else
                 {
                     for (int d = Digits(en.Score); d < digitS; d++)
@@ -313,13 +321,11 @@ namespace ToofzBot
                         str += " ";
                     }
                 }
+                if (lb.Run == "Deathless" && en.Score >= 100)
+                    str += " ";
                 str += ScoreToString(en.Score, type, lb.Character);
                 str += "\t" + en.Player + "\n";
             }
-
-            if (en == null)
-                return ("No entries found for " + lb.Character + " / " + lb.Run + " ( offset = " + offset + " ).");
-
             return str;
         }
 
