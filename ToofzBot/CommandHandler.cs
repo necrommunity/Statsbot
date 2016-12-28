@@ -101,21 +101,26 @@ namespace ToofzBot
                     return (SearchLeaderboard(q));
                 case "help":
                     q = q.Replace("help ", null);
-                    if (q.StartsWith("search"))
-                        return ("Searches for a player."
-                            + "\nType \".toofz search <name>\" to see a list of search results, or \".toofz search <name>: <category>\" to see results for a specific category."
-                            + "\nSteamID can be used instead of a name (\".toofz search #245356: seeded score\").");
-                    if (q.StartsWith("leaderboard"))
-                        return ("Displays a leaderboard."
-                            + "\nType \".toofz leaderboard <character>: <category>\" to see a leaderboard."
-                            + "\nAdd \"&<rank>\" or \"offset=<rank>\" to see the result starting at the specified offset.");
-                    return ("ToofzBot is a bot which retrieves Crypt of the Necrodancer player stats."
-                        + "\n\tAvailable commands: \"search\", \"leaderboard\"."
-                        + "\nUse \"search\", \"leaderboard\", or \"help <command>\" for more information."
-                        + "\n Ping Naymin#5067 for questions and bug reports.");
+                    return HelpCommand(q);
                 default:
                     return ("Unknown command. Use \"search\", \"leaderboard\", or \"help <command>\" for more information.");
             }
+        }
+
+        public static string HelpCommand(string q)
+        {
+            if (q.StartsWith("search"))
+                return ("Searches for a player."
+                    + "\nType \".toofz search <name>\" to see a list of search results, or \".toofz search <name>: <category>\" to see results for a specific category."
+                    + "\nSteamID can be used instead of a name (\".toofz search #245356: seeded score\").");
+            if (q.StartsWith("leaderboard"))
+                return ("Displays a leaderboard."
+                    + "\nType \".toofz leaderboard <character>: <category>\" to see a leaderboard."
+                    + "\nAdd \"&<rank>\" or \"offset=<rank>\" to see the result starting at the specified offset.");
+            return ("ToofzBot is a bot which retrieves Crypt of the Necrodancer player stats."
+                + "\n\tAvailable commands: \"search\", \"leaderboard\"."
+                + "\nUse \"search\", \"leaderboard\", or \"help <command>\" for more information."
+                + "\nPing Naymin#5067 for questions and bug reports.");
         }
 
         public static string SearchName(string q)
