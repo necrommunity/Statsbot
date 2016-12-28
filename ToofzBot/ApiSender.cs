@@ -11,13 +11,20 @@ namespace ToofzBot
 
         public static T ServerGet<T>(string args)
         {
-            T obj;
+            T obj = default(T);
             string response;
-            using (WebClient client = new WebClient())
+            try
             {
-                response = client.DownloadString("https://api.toofz.com/" + args);
+                using (WebClient client = new WebClient())
+                {
+                    response = client.DownloadString("https://api.toofz.com/" + args);
+                }
+                obj = JsonConvert.DeserializeObject<T>(response);
             }
-            obj = JsonConvert.DeserializeObject<T>(response);
+            catch
+            {
+                Console.WriteLine("Serious error occured. Server not responding.");
+            }
             return obj;
         }
 
