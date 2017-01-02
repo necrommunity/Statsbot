@@ -15,6 +15,8 @@ namespace ToofzBot
 
         public static int Digits(int i)
         {
+            if (i == 0)
+                return 1;
             return (int)Math.Floor(Math.Log10(i) + 1);
         }
 
