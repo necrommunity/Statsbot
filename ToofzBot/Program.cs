@@ -82,7 +82,7 @@ namespace ToofzBot
 
         public void Log(object sender, LogMessageEventArgs e)
         {
-            Console.WriteLine($"[{e.Severity}] [{e.Source}] [{e.Message}]");
+            Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}] [{e.Severity}] [{e.Source}] [{e.Message}]");
         }
 
     }
