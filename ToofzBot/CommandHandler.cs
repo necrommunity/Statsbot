@@ -104,6 +104,8 @@ namespace ToofzBot
                 case "help":
                     q = q.Replace("help ", null);
                     return HelpCommand(q);
+                case "info":
+                    return ("ToofzBot v0.77. Type \"help\" for a list of commands.");
                 default:
                     return ("Unknown command. Use \"search\", \"leaderboard\", or \"help <command>\" for more information.");
             }
@@ -120,7 +122,7 @@ namespace ToofzBot
                     + "\nType \".toofz leaderboard <character>: <category>\" to see a leaderboard."
                     + "\nAdd \"&<rank>\" or \"offset=<rank>\" to see the result starting at the specified offset.");
             return ("ToofzBot is a bot which retrieves Crypt of the Necrodancer player stats."
-                + "\n\tAvailable commands: \"search\", \"leaderboard\"."
+                + "\n\tAvailable commands: \"search\", \"leaderboard\", \"info\"."
                 + "\nUse \"search\", \"leaderboard\", or \"help <command>\" for more information."
                 + "\nPing Naymin#5067 for questions and bug reports.");
         }
