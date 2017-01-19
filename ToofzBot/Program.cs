@@ -83,7 +83,7 @@ namespace ToofzBot
 
         public void Log(object sender, LogMessageEventArgs e)
         {
-            Console.WriteLine($"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] [{e.Severity}] [{e.Source}] [{e.Message}]");
+            Console.WriteLine($"[{DateTime.Now.ToString(CultureInfo.CurrentCulture)}] [{e.Severity}] [{e.Source}] [{e.Message}]");
         }
 
     }
