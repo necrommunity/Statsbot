@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
+using System.Globalization;
 using Discord;
 using Discord.Commands;
 
@@ -82,7 +83,7 @@ namespace ToofzBot
 
         public void Log(object sender, LogMessageEventArgs e)
         {
-            Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}] [{e.Severity}] [{e.Source}] [{e.Message}]");
+            Console.WriteLine($"[{DateTime.Now.ToString(new CultureInfo("fr-FR"))}] [{e.Severity}] [{e.Source}] [{e.Message}]");
         }
 
     }

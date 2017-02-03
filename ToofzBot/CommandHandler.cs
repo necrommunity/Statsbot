@@ -85,13 +85,17 @@ namespace ToofzBot
 
         public static string ToofzCommand(string q)
         {
-            string str = q.Split(new[] { ' ' })[0];
 
             if (q.Contains("penguin"))
                 return ("@ᕕ(' >')ᕗᕕ(' >')ᕗᕕ(' >')ᕗ" + "\npls no bulli");
 
             if (q.Contains("​")) //gets rid of invisible space
                 q = q.Replace("​", null);
+
+            q = q.ToLower();
+
+            string str = q.Split(new[] { ' ' })[0];
+
 
             switch (str)
             {
@@ -105,7 +109,7 @@ namespace ToofzBot
                     q = q.Replace("help ", null);
                     return HelpCommand(q);
                 case "info":
-                    return ("ToofzBot v0.77. Type \"help\" for a list of commands.");
+                    return ("ToofzBot v0.78. Type \"help\" for a list of commands.");
                 default:
                     return ("Unknown command. Use \"search\", \"leaderboard\", or \"help <command>\" for more information.");
             }
