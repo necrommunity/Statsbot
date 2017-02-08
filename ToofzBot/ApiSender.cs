@@ -28,12 +28,12 @@ namespace ToofzBot
             return obj;
         }
 
-        public static void RegisterLeaderboards()
+        public static LeaderboardResults GetLeaderboardId(string character, string type, bool amplified)
         {
-            Leaderboard[] response = ServerGet<Leaderboard[]>("leaderboards/primaries");
-
-            File.WriteAllText(@"Leaderboards.json", JsonConvert.SerializeObject(response, Formatting.Indented));
-            Console.WriteLine("[Leaderboards registered to Leaderboards.json]");
+            string product = "classic";
+            if (amplified)
+                product = "amplified";
+            return (ServerGet<LeaderboardResults>("leaderboards?products=" + product + "&runs=" + type + "&characters=" + character));
         }
 
         public static Leaderboard[] GetLeaderboards()
@@ -45,35 +45,31 @@ namespace ToofzBot
             return (JsonConvert.DeserializeObject<Leaderboard[]>(File.ReadAllText(@"Leaderboards.json")));
         }
 
-        public static PlayerResults GetPlayers(string q)
+        public static LeaderboardEntries GetLeaderboardEntries(int lbId, int offset)
+        {
+            string lboard = "leaderboards/" + lbId + "/entries?offset=" + offset;
+            return (ServerGet<LeaderboardEntries>(lboard));
+        }
+
+        public static void RegisterLeaderboards()
+        {
+            Leaderboard[] response = ServerGet<Leaderboard[]>("leaderboards/primaries");
+
+            File.WriteAllText(@"Leaderboards.json", JsonConvert.SerializeObject(response, Formatting.Indented));
+            Console.WriteLine("[Leaderboards registered to Leaderboards.json]");
+        }
+
+        public static PlayerResults GetPlayerResults(string q)
         {
             return (ServerGet<PlayerResults>("players?q=" + q));
         }
 
-        public static Player GetPlayersId(string steamId)
+        public static PlayerEntries GetPlayerEntries(string id)
         {
-            return (ServerGet<Player>("players/" + steamId));
+            return (ServerGet<PlayerEntries>("players/" + id + "/entries"));
         }
 
-        public static LeaderBoardEntries GetLeaderboardEntries(int lbId, int offset)
-        {
-            string lboard = "leaderboards/" + lbId + "/entries?offset=" + offset;
-            return (ServerGet<LeaderBoardEntries>(lboard));
-        }
 
-        public static SteamUser GetSteamUser(string id) //https://developer.valvesoftware.com/wiki/Steam_Web_API#GetPlayerSummaries_.28v0002.29
-        {
-            SteamResponse users;
-            string response;
-            using (WebClient client = new WebClient())
-            {
-                response = client.DownloadString("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" + Program.config.SteamKey + "&steamids=" + id);
-            }
-            users = JsonConvert.DeserializeObject<SteamResponse>(response);
-            if (users.Response.Players.Length == 0)
-                return (new SteamUser());
-            return users.Response.Players[0];
-        }
     }
 }
 

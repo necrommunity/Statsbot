@@ -8,8 +8,13 @@ namespace ToofzBot
 {
     public class Player
     {
-        public DateTime LeaderboardsLastUpdate { get; set; }
-        public DateTime Timestamp { get; set; }
-        public PlayerRun[] Runs { get; set; }
+        public string Id { get; set; }
+        public string Display_name { get; set; }
+        public string Avatar { get; set; }
+    }
+
+    public class PlayerResults
+    {
+        public Player[] Players { get; set; }
     }
 }
