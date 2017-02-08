@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace ToofzBot
 {
-    public class Leaderboard
+    public class PlayerEntry
     {
-        public int LeaderboardId { get; set; }
         public string Character { get; set; }
-        public string Run { get; set; }
+        public string Rank { get; set; }
+        public int Score { get; set; }
     }
 }

@@ -9,10 +9,13 @@ namespace ToofzBot
     public class Entry
     {
         public string SteamId { get; set; }
-        public string ProfileName { get; set; }
         public int Rank { get; set; }
+        public string Player { get; set; }
+        public string Slug { get; set; }
         public int Score { get; set; }
-        public string UgcId { get; set; }
+        public int Zone { get; set; }
+        public int Level { get; set; }
+        public string killedBy { get; set; }
         
     }
 }

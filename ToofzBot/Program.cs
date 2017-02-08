@@ -16,9 +16,6 @@ namespace ToofzBot
 
         static void Main(string[] args)
         {
-            Leaderbot.lbInfo = Leaderbot.ParseIndex();
-            Leaderbot.LoadNames();
-            config = Config.ReadConfig();
             new Program().Start();
         }
 
@@ -38,10 +35,12 @@ namespace ToofzBot
             {
                 x.AllowMentionPrefix = true;
                 x.PrefixChar = '.';
-            //x.HelpMode = HelpMode.Public;
-        });
+                //x.HelpMode = HelpMode.Public;
+            });
 
             CreateCommands();
+
+            config = Config.ReadConfig();
 
             if (config.DiscordToken == "" || config.SteamKey == "")
             {
@@ -58,18 +57,18 @@ namespace ToofzBot
         {
             var cService = client.GetService<CommandService>();
 
-            cService.CreateCommand("leaderbot")
+            cService.CreateCommand("toofz")
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    var toReturn = CommandHandler.LeaderbotCommand(e.GetArg(0));
+                    var toReturn = CommandHandler.ToofzCommand(e.GetArg(0));
                     await e.Channel.SendMessage("```" + toReturn + "```");
                 });
             cService.CreateCommand("help")
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    var toReturn = CommandHandler.LeaderbotCommand("help");
+                    var toReturn = CommandHandler.ToofzCommand("help");
                     await e.Channel.SendMessage("```" + toReturn + "```");
                 });
             //cService.CreateCommand("test")
