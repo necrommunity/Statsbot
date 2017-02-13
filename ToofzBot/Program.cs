@@ -80,7 +80,6 @@ namespace ToofzBot
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    var toReturn = CommandHandler.ToofzCommand("help");
                     await e.Channel.SendMessage("```ToofzBot is a bot which retrieves Crypt of the Necrodancer player stats."
                 + "\n\tAvailable commands: \".toofz search\", \".toofz leaderboard\", \".toofz info\", \".stats\"."
                 + "\nPing Naymin#5067 for questions and bug reports.```");

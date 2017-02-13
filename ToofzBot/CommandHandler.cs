@@ -227,6 +227,8 @@ namespace ToofzBot
             if (player == null)
                 return ("Couldn't find results for \"" + q + "\".");
             PlayerStats playerStats = StatsResponse.GetPlayerStats(player.Id);
+            if(playerStats.Stats == null)
+                return ("Couldn't access " + player.Display_name + "'s profile (likely private).");
             playerStats.OrganizeStats();
             Dictionary<string, int> stats = playerStats.Organized;
             Playtime time = PlaytimeResponse.GetPlaytime(player.Id);

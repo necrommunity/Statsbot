@@ -16,12 +16,19 @@ namespace ToofzBot
         public static PlayerStats GetPlayerStats(string id) // https://developer.valvesoftware.com/wiki/Steam_Web_API#GetUserStatsForGame_.28v0002.29
         {
             string response;
-            using (WebClient client = new WebClient())
+            try
             {
-                response = client.DownloadString("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=247080&key=" + Program.config.SteamKey + "&steamid=" + id);
+                using (WebClient client = new WebClient())
+                {
+                    response = client.DownloadString("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=247080&key=" + Program.config.SteamKey + "&steamid=" + id);
+                }
+                PlayerStats toReturn = JsonConvert.DeserializeObject<StatsResponse>(response).Playerstats;
+                return (toReturn);
             }
-            PlayerStats toReturn = JsonConvert.DeserializeObject<StatsResponse>(response).Playerstats;
-            return (toReturn);
+            catch
+            {
+                return (new PlayerStats());
+            }
         }
     }
 
