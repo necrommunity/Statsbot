@@ -90,6 +90,8 @@
     <Compile Include="PlayerEntry.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Leaderboard.cs" />
+    <Compile Include="PlayerStats.cs" />
+    <Compile Include="Playtime.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
