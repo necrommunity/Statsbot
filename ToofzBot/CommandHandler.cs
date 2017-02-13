@@ -90,9 +90,6 @@ namespace ToofzBot
         public static string ToofzCommand(string q)
         {
 
-            if (q.Contains("penguin"))
-                return ("@ᕕ(' >')ᕗᕕ(' >')ᕗᕕ(' >')ᕗ" + "\npls no bulli");
-
             if (q.Contains("​")) //gets rid of invisible space
                 q = q.Replace("​", null);
 
@@ -113,7 +110,7 @@ namespace ToofzBot
                     q = q.Replace("help ", null);
                     return HelpCommand(q);
                 case "info":
-                    return ("ToofzBot v0.81. Type \"help\" for a list of commands.");
+                    return ("ToofzBot v0.83 (now with stats!). Type \"help\" for a list of commands.");
                 default:
                     return ("Unknown command. Use \"search\", \"leaderboard\", or \"help <command>\" for more information.");
             }
@@ -155,7 +152,7 @@ namespace ToofzBot
                 {
                     Player player = players.Players[i];
                     str += player.Display_name + "\n";
-                    str += "\tSteam Id : " + player.Id + "\n";
+                    str += "\tSteam ID : " + player.Id + "\n";
                 }
                 return str;
             }
@@ -164,34 +161,45 @@ namespace ToofzBot
             string type = q.Split(new[] { ':' })[1];
             type = type.Replace(" ", null);
 
-            return (SearchPlayer(name, type, isId));
+            return (DisplayPlayerResults(name, type));
         }
 
-        public static string SearchPlayer(string name, string type, bool isId)
+        public static PlayerEntries GetPlayer(string name)
         {
-
             PlayerEntries playerEntries;
 
-            string str = "";
+            bool isId = name.StartsWith("#");
+            if (isId)
+                name = name.Replace("#", null);
 
             if (isId)
             {
                 try { playerEntries = ApiSender.GetPlayerEntries(name); }
-                catch { return ("Couldn't find results for the steamID \"" + name + "\"."); }
-                if (playerEntries.Entries.Length == 0)
-                    return ("No entries found for steamID " + name + " in the category " + type + ".");
+                catch { return null; }
             }
 
             else
             {
                 PlayerResults results = ApiSender.GetPlayerResults(name);
                 if (results.Players.GetLength(0) == 0)
-                    return ("Couldn't find results for the name \"" + name + "\".");
+                    return null;
 
                 playerEntries = ApiSender.GetPlayerEntries(results.Players[0].Id);
-                if (playerEntries.Entries.Length == 0)
-                    return ("No entries found for the player \"" + name + "\" in the category " + type + ".");
             }
+            return playerEntries;
+        }
+
+        public static string DisplayPlayerResults(string name, string type)
+        {
+
+            PlayerEntries playerEntries = GetPlayer(name);
+            if (playerEntries == null)
+                return ("Couldn't find results for \"" + name + "\".");
+            if (playerEntries.Entries.Length == 0)
+                return ("No entries found for " + name + " in the category " + type + ".");
+
+
+            string str = "";
 
             str += "Player: " + playerEntries.Player.Display_name + "\n";
             str += "SteamID: " + playerEntries.Player.Id + "\n";
@@ -211,6 +219,51 @@ namespace ToofzBot
                 }
             }
             return str;
+        }
+
+        public static string SearchPlayerStats(string q)
+        {
+            Player player = GetPlayer(q).Player;
+            if (player.Id == null)
+                return ("Couldn't find results for \"" + q + "\".");
+            PlayerStats playerStats = StatsResponse.GetPlayerStats(player.Id);
+            playerStats.OrganizeStats();
+            Dictionary<string, int> stats = playerStats.Organized;
+            Playtime time = PlaytimeResponse.GetPlaytime(player.Id);
+
+            string str = "";
+            str += "Player: " + player.Display_name + "\n";
+            str += "SteamID: " + player.Id + "\n";
+            str += "Total playtime: " + time.Playtime_forever / 60 + " hours (" + time.Playtime_2weeks / 60 + " recently)\n\n";
+
+            str += "Deaths: " + stats["Deaths"] + " (" + (stats["Deaths"] / (float)(time.Playtime_forever / 60)) + " per hour)\n";
+            str += "Green bats killed: " + stats["Bats"] + "\n";
+            str += "Zone clears: " + stats["Z1"] + " | " + stats["Z2"] + " | " + stats["Z3"] + " | " + stats["Z4"] + "\n";
+            str += "Character clears ";
+            foreach (string s in PlayerStats.Characters)
+            {
+                if (stats[s] != 0)
+                {
+                    str += "\n   " + s;
+                    for (int i = s.Length; i < 10; i++)
+                    { str += " "; }
+                    str += stats[s];
+                    switch (s)
+                    {
+                        case "Cadence":
+                            str += " (" + stats["Speedruns"] + " sub-15, " + stats["Dailies"] + " dailies)";
+                            break;
+                        case "Aria":
+                            str += " (" + stats["AriaLow"] + " low%)";
+                            break;
+                        case "All":
+                            str += " (" + stats["Lowest"] + " low%)";
+                            break;
+                    }
+                }
+            }
+            return str;
+
         }
 
         public static string SearchLeaderboard(string q)
@@ -267,7 +320,7 @@ namespace ToofzBot
 
             Entry en = null;
 
-            str += "Displaying leaderboard results for " +lb.Display_name + "\n\n";
+            str += "Displaying leaderboard results for " + lb.Display_name + "\n\n";
             for (int i = offset; i < (leaderboard.Entries.GetLength(0)) && i < offset + 15; i++)
             {
                 en = leaderboard.Entries[i - offset];

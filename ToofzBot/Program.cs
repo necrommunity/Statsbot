@@ -64,12 +64,26 @@ namespace ToofzBot
                     var toReturn = CommandHandler.ToofzCommand(e.GetArg(0));
                     await e.Channel.SendMessage("```" + toReturn + "```");
                 });
+            cService.CreateCommand("stats")
+                .Parameter("arg", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    var toReturn = CommandHandler.SearchPlayerStats(e.GetArg(0));
+                    await e.Channel.SendMessage("```" + toReturn + "```");
+                });
+            cService.CreateCommand("penguin")
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendMessage("ᕕ(' >')ᕗᕕ(' >')ᕗᕕ(' >')ᕗ" + "\npls no bulli");
+                });
             cService.CreateCommand("help")
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
                     var toReturn = CommandHandler.ToofzCommand("help");
-                    await e.Channel.SendMessage("```" + toReturn + "```");
+                    await e.Channel.SendMessage("```ToofzBot is a bot which retrieves Crypt of the Necrodancer player stats."
+                + "\n\tAvailable commands: \".toofz search\", \".toofz leaderboard\", \".toofz info\", \".stats\"."
+                + "\nPing Naymin#5067 for questions and bug reports.```");
                 });
             //cService.CreateCommand("test")
             //    .Description("aaa.")
