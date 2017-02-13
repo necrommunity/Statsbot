@@ -175,14 +175,14 @@ namespace ToofzBot
             if (isId)
             {
                 try { playerEntries = ApiSender.GetPlayerEntries(name); }
-                catch { return null; }
+                catch { return new PlayerEntries(); }
             }
 
             else
             {
                 PlayerResults results = ApiSender.GetPlayerResults(name);
                 if (results.Players.GetLength(0) == 0)
-                    return null;
+                    return new PlayerEntries();
 
                 playerEntries = ApiSender.GetPlayerEntries(results.Players[0].Id);
             }
@@ -224,7 +224,7 @@ namespace ToofzBot
         public static string SearchPlayerStats(string q)
         {
             Player player = GetPlayer(q).Player;
-            if (player.Id == null)
+            if (player == null)
                 return ("Couldn't find results for \"" + q + "\".");
             PlayerStats playerStats = StatsResponse.GetPlayerStats(player.Id);
             playerStats.OrganizeStats();

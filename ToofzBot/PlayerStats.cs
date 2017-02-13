@@ -27,7 +27,7 @@ namespace ToofzBot
 
     public class PlayerStats
     {
-        public enum StatsList { Deaths, Freddies, Bats, Z1, Z2, Z3, Z4, Speedruns, Dalies, Cadence, Aria, Bard, Bolt, Monk, Dove, Eli, Melody, Dorian, Coda, Nocturna, All, AriaLow, Lowest };
+        public enum StatsList { Deaths, Freddies, Bats, Z1, Z2, Z3, Z4, Speedruns, Dailies, Cadence, Aria, Bard, Bolt, Monk, Dove, Eli, Melody, Dorian, Coda, Nocturna, All, AriaLow, Lowest };
         public static string[] Characters = new string[12];
         public string SteamID { get; set; }
         public Stat[] Stats { get; set; }
