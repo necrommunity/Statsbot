@@ -8,7 +8,7 @@ namespace ToofzBot
 {
     public class Leaderboard
     {
-        public int Id { get; set; }
+        public int ID { get; set; }
         public string Product { get; set; }
         public string Character { get; set; }
         public string Run { get; set; }

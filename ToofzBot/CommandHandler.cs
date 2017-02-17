@@ -20,41 +20,19 @@ namespace ToofzBot
             return (int)Math.Floor(Math.Log10(i) + 1);
         }
 
-        public static int FlipZone(int i)
-        {
-            switch (i)
-            {
-                case 0:
-                    i = 5;
-                    break;
-                case 1:
-                    i = 4;
-                    break;
-                case 2:
-                    i = 3;
-                    break;
-                case 3:
-                    i = 2;
-                    break;
-                case 4:
-                    i = 1;
-                    break;
-            }
-            return (i);
-        }
 
         public static string ScoreToString(int score, string type, string character, bool amplified)
         {
-            string s = "";
+            StringBuilder sb = new StringBuilder();
             switch (type)
             {
                 case "Score":
                 case "SeededScore":
                     for (int i = Digits(score); i < 7; i++)
                     {
-                        s += " ";
+                        sb.Append(" ");
                     }
-                    return (s + score.ToString());
+                    return (sb.ToString() + score.ToString());
 
                 case "Speed":
                 case "SeededSpeed":
@@ -71,16 +49,16 @@ namespace ToofzBot
                         d = 3;
                     for (; d < 5; d++)
                     {
-                        s += " ";
+                        sb.Append(" ");
                     }
                     int wins = score / 100;
                     score = score % 100;
                     if (!character.Equals("Aria"))
-                        return (s + wins + " (" + (score / 10 + 1) + "-" + (score % 10 + 1) + ")");
+                        return (sb.ToString() + wins + " (" + (score / 10 + 1) + "-" + (score % 10 + 1) + ")");
                     if (amplified)
-                        return (s + wins + " (" + FlipZone(score / 10) + "-" + (score % 10 + 1) + ")");
+                        return (sb.ToString() + wins + " (" + (5 - (score / 10)) + "-" + (score % 10 + 1) + ")");
                     else
-                        return (s + wins + " (" + FlipZone(score / 10 + 1) + "-" + (score % 10 + 1) + ")");
+                        return (sb.ToString() + wins + " (" + (4 - (score / 10 + 1)) + "-" + (score % 10 + 1) + ")");
                 default:
                     return "error";
             }
@@ -90,12 +68,12 @@ namespace ToofzBot
         public static string ToofzCommand(string q)
         {
 
-            if (q.Contains("​")) //gets rid of invisible space
+            if (q.Contains("​")) //gets rid of invisible character
                 q = q.Replace("​", null);
 
             q = q.ToLower();
 
-            string str = q.Split(new[] { ' ' })[0];
+            string str = q.Split(' ')[0];
 
 
             switch (str)
@@ -110,7 +88,7 @@ namespace ToofzBot
                     q = q.Replace("help ", null);
                     return HelpCommand(q);
                 case "info":
-                    return ("ToofzBot v0.83 (now with stats!). Type \"help\" for a list of commands.");
+                    return ("ToofzBot v0.84. Type \"help\" for a list of commands.");
                 default:
                     return ("Unknown command. Use \"search\", \"leaderboard\", or \"help <command>\" for more information.");
             }
@@ -135,30 +113,31 @@ namespace ToofzBot
 
         public static string SearchName(string q)
         {
-            string str = "";
-            bool isId = q.StartsWith("#");
-            if (isId)
+            StringBuilder sb = new StringBuilder();
+            bool isID = q.StartsWith("#");
+            if (isID)
                 q = q.Replace("#", null);
 
-            if (!q.Contains(":") && !isId) //if the search isnt specified
+            if (!q.Contains(":") && !isID) //if the search isnt specified
             {
-                PlayerResults players = ApiSender.GetPlayerResults(q);
+                PlayerResults players = ApiSender.GetNames(q);
 
                 if (players.Players.GetLength(0) == 0)
-                    return ("No results found for the name \"" + q + "\".");
+                    return ("No results found for \"" + q + "\".");
 
-                str += "Displaying top results for the name \"" + q + "\"\n\n";
+                sb.Append("Displaying top results for \"" + q + "\"\n\n");
                 for (int i = 0; i < players.Players.GetLength(0) && i < 5; i++)
                 {
                     Player player = players.Players[i];
-                    str += player.Display_name + "\n";
-                    str += "\tSteam ID : " + player.Id + "\n";
+                    sb.Append(player.Display_name + "\n");
+                    sb.Append("\tSteam ID : " + player.ID + "\n");
                 }
-                return str;
+                return sb.ToString();
             }
 
-            string name = q.Split(new[] { ':' })[0];
-            string type = q.Split(new[] { ':' })[1];
+            string[] split = q.Split(':');
+            string name = split[0];
+            string type = split[1];
             type = type.Replace(" ", null);
 
             return (DisplayPlayerResults(name, type));
@@ -168,23 +147,23 @@ namespace ToofzBot
         {
             PlayerEntries playerEntries;
 
-            bool isId = name.StartsWith("#");
-            if (isId)
+            bool isID = name.StartsWith("#");
+            if (isID)
                 name = name.Replace("#", null);
 
-            if (isId)
+            if (isID)
             {
-                try { playerEntries = ApiSender.GetPlayerEntries(name); }
+                try { playerEntries = ApiSender.GetPlayerScores(name); }
                 catch { return new PlayerEntries(); }
             }
 
             else
             {
-                PlayerResults results = ApiSender.GetPlayerResults(name);
+                PlayerResults results = ApiSender.GetNames(name);
                 if (results.Players.GetLength(0) == 0)
                     return new PlayerEntries();
 
-                playerEntries = ApiSender.GetPlayerEntries(results.Players[0].Id);
+                playerEntries = ApiSender.GetPlayerScores(results.Players[0].ID);
             }
             return playerEntries;
         }
@@ -198,27 +177,26 @@ namespace ToofzBot
             if (playerEntries.Entries.Length == 0)
                 return ("No entries found for " + name + " in the category " + type + ".");
 
+            StringBuilder sb = new StringBuilder();
 
-            string str = "";
-
-            str += "Player: " + playerEntries.Player.Display_name + "\n";
-            str += "SteamID: " + playerEntries.Player.Id + "\n";
-            str += "Top " + type + " results\n";
+            sb.Append("Player: " + playerEntries.Player.Display_name + "\n");
+            sb.Append("SteamID: " + playerEntries.Player.ID + "\n\n");
+            sb.Append("Top " + type + " results\n");
 
             foreach (Entry en in playerEntries.Entries)
             {
                 if (type.Equals(en.Leaderboard.Run, StringComparison.OrdinalIgnoreCase))
                 {
-                    str += "\t" + en.Leaderboard.Character + " (" + en.Leaderboard.Product + ")";
+                    sb.Append("\t" + en.Leaderboard.Character + " (" + en.Leaderboard.Product + ")");
                     for (int i = en.Leaderboard.Character.Length + en.Leaderboard.Product.Length; i < 17; i++)
                     {
-                        str += " ";
+                        sb.Append(" ");
                     }
-                    str += ScoreToString(en.Score, en.Leaderboard.Run, en.Leaderboard.Character, en.Leaderboard.Product.Equals("Amplified"))
-                            + " | " + en.Rank + "\n";
+                    sb.Append(ScoreToString(en.Score, en.Leaderboard.Run, en.Leaderboard.Character, en.Leaderboard.Product.Equals("Amplified"))
+                            + " | " + en.Rank + "\n");
                 }
             }
-            return str;
+            return sb.ToString();
         }
 
         public static string SearchPlayerStats(string q)
@@ -226,45 +204,45 @@ namespace ToofzBot
             Player player = GetPlayer(q).Player;
             if (player == null)
                 return ("Couldn't find results for \"" + q + "\".");
-            PlayerStats playerStats = StatsResponse.GetPlayerStats(player.Id);
-            if(playerStats.Stats == null)
+            PlayerStats playerStats = ApiSender.GetPlayerStats(player.ID);
+            if (playerStats.Stats == null)
                 return ("Couldn't access " + player.Display_name + "'s profile (likely private).");
             playerStats.OrganizeStats();
             Dictionary<string, int> stats = playerStats.Organized;
-            Playtime time = PlaytimeResponse.GetPlaytime(player.Id);
+            Playtime time = PlaytimeResponse.GetPlaytime(player.ID);
 
-            string str = "";
-            str += "Player: " + player.Display_name + "\n";
-            str += "SteamID: " + player.Id + "\n";
-            str += "Total playtime: " + time.Playtime_forever / 60 + " hours (" + time.Playtime_2weeks / 60 + " recently)\n\n";
+            StringBuilder sb = new StringBuilder();
+            sb.Append("Player: " + player.Display_name + "\n");
+            sb.Append("SteamID: " + player.ID + "\n");
+            sb.Append("Total playtime: " + time.Playtime_forever / 60 + " hours (" + time.Playtime_2weeks / 60 + " recently)\n\n");
 
-            str += "Deaths: " + stats["Deaths"] + " (" + (stats["Deaths"] / (float)(time.Playtime_forever / 60)) + " per hour)\n";
-            str += "Green bats killed: " + stats["Bats"] + "\n";
-            str += "Zone clears: " + stats["Z1"] + " | " + stats["Z2"] + " | " + stats["Z3"] + " | " + stats["Z4"] + "\n";
-            str += "Character clears ";
+            sb.Append("Deaths: " + stats["deaths"] + " (" + (stats["deaths"] / (float)(time.Playtime_forever / 60)) + " per hour)\n");
+            sb.Append("Green bats killed: " + stats["bats"] + "\n");
+            sb.Append("Zone clears: " + stats["z1"] + " | " + stats["z2"] + " | " + stats["z3"] + " | " + stats["z4"] + "\n");
+            sb.Append("Character clears ");
             foreach (string s in PlayerStats.Characters)
             {
                 if (stats[s] != 0)
                 {
-                    str += "\n   " + s;
+                    sb.Append("\n   " + s);
                     for (int i = s.Length; i < 10; i++)
-                    { str += " "; }
-                    str += stats[s];
+                    { sb.Append(" "); }
+                    sb.Append(stats[s]);
                     switch (s)
                     {
                         case "Cadence":
-                            str += " (" + stats["Speedruns"] + " sub-15, " + stats["Dailies"] + " dailies)";
+                            sb.Append(" (" + stats["speedruns"] + " sub-15, " + stats["dailies"] + " dailies)");
                             break;
                         case "Aria":
-                            str += " (" + stats["AriaLow"] + " low%)";
+                            sb.Append(" (" + stats["ariaLow"] + " low%)");
                             break;
                         case "All":
-                            str += " (" + stats["Lowest"] + " low%)";
+                            sb.Append(" (" + stats["lowest"] + " low%)");
                             break;
                     }
                 }
             }
-            return str;
+            return sb.ToString();
 
         }
 
@@ -281,9 +259,10 @@ namespace ToofzBot
                 q = q.Replace("classic", null);
             }
 
-            string character = q.Split(new[] { ':' })[0];
+            string[] split = q.Split(':');
+            string character = split[0];
             character = character.Replace(" ", null);
-            string type = q.Split(new[] { ':' })[1];
+            string type = split[1];
             int offset = 0;
             Leaderboard lb = null;
 
@@ -295,46 +274,46 @@ namespace ToofzBot
 
             if (type.Contains("&"))
             {
-                bool pos = int.TryParse(type.Split(new[] { '&' })[1], out offset);
+                bool pos = int.TryParse(type.Split('&')[1], out offset);
                 if (!pos)
                     return ("Please enter a valid offset.");
-                type = type.Split(new[] { '&' })[0];
+                type = type.Split('&')[0];
             }
 
-            type = type.Trim();
+            type = type.Replace(" ", null);
 
             try
             {
-                lb = ApiSender.GetLeaderboardId(character, type, amplified).Leaderboards[0];
+                lb = ApiSender.GetLeaderboardID(character, type, amplified).Leaderboards[0];
             }
             catch
             {
                 return ("Please enter a valid leaderboard.");
             }
 
-            LeaderboardEntries leaderboard = ApiSender.GetLeaderboardEntries(lb.Id, offset);
+            LeaderboardEntries leaderboard = ApiSender.GetLeaderboardEntries(lb.ID, offset);
 
             if (leaderboard.Entries.Length == 0)
                 return ("No entries found for " + lb.Character + " / " + lb.Run + " ( offset = " + offset + " ).");
 
-            string str = "";
+            StringBuilder sb = new StringBuilder();
             int digitR = Digits(offset + 15);
 
             Entry en = null;
 
-            str += "Displaying leaderboard results for " + lb.Display_name + "\n\n";
+            sb.Append("Displaying leaderboard results for " + lb.Display_name + "\n\n");
             for (int i = offset; i < (leaderboard.Entries.GetLength(0)) && i < offset + 15; i++)
             {
                 en = leaderboard.Entries[i - offset];
 
                 if (Digits(en.Rank) < digitR)
-                    str += "0";
+                    sb.Append("0");
 
-                str += en.Rank + ".   "
+                sb.Append(en.Rank + ".   "
                     + ScoreToString(en.Score, lb.Run, lb.Character, amplified)
-                    + "\t" + en.Player.Display_name + "\n";
+                    + "\t" + en.Player.Display_name + "\n");
             }
-            return str;
+            return sb.ToString();
 
         }
 

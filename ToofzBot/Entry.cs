@@ -10,7 +10,7 @@ namespace ToofzBot
     {
         public Leaderboard Leaderboard { get; set; }
         public Player Player { get; set; }
-        public string SteamId { get; set; }
+        public string SteamID { get; set; }
         public int Rank { get; set; }
         public int Score { get; set; }
         

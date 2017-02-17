@@ -8,7 +8,7 @@ namespace ToofzBot
 {
     public class Player
     {
-        public string Id { get; set; }
+        public string ID { get; set; }
         public string Display_name { get; set; }
         public string Avatar { get; set; }
     }
