@@ -9,66 +9,72 @@ namespace ToofzBot
     public static class ApiSender
     {
 
-        public static T ServerGet<T>(string args)
+        public static T ServerGet<T>(string args, string product)
         {
+
             T obj = default(T);
+            string request = "https://api.toofz.com/" + args;
+
+            if (product == "steam")
+                request = "http://api.steampowered.com/" + args + "&key=" + Program.config.SteamKey;
+
             string response;
             try
             {
                 using (WebClient client = new WebClient())
                 {
-                    response = client.DownloadString("https://api.toofz.com/" + args);
+                    response = client.DownloadString(request);
                 }
                 obj = JsonConvert.DeserializeObject<T>(response);
             }
             catch
             {
-                Console.WriteLine("Serious error occured. Server not responding.");
+                Console.WriteLine("[Server not responding.]");
             }
             return obj;
         }
 
-        public static LeaderboardResults GetLeaderboardId(string character, string type, bool amplified)
+        public static LeaderboardResults GetLeaderboardID(string character, string type, bool amplified)
         {
             string product = "classic";
             if (amplified)
                 product = "amplified";
-            return (ServerGet<LeaderboardResults>("leaderboards?products=" + product + "&runs=" + type + "&characters=" + character));
+            return (ServerGet<LeaderboardResults>("leaderboards?products=" + product + "&runs=" + type + "&characters=" + character, "toofz"));
         }
 
-        public static Leaderboard[] GetLeaderboards()
+        public static LeaderboardEntries GetLeaderboardEntries(int id, int offset)
         {
-            if (!File.Exists(@"Leaderboards.json"))
+            string lboard = "leaderboards/" + id + "/entries?offset=" + offset;
+            return (ServerGet<LeaderboardEntries>(lboard, "toofz"));
+        }
+
+        public static PlayerResults GetNames(string q)
+        {
+            return (ServerGet<PlayerResults>("players?q=" + q, "toofz"));
+        }
+
+        public static PlayerEntries GetPlayerScores(string id)
+        {
+            return (ServerGet<PlayerEntries>("players/" + id + "/entries", "toofz"));
+        }
+
+        public static PlayerStats GetPlayerStats(string id) // https://developer.valvesoftware.com/wiki/Steam_Web_API#GetUserStatsForGame_.28v0002.29
+        {
+            try
             {
-                RegisterLeaderboards();
+                return (ServerGet<StatsResponse>("ISteamUserStats/GetUserStatsForGame/v0002/?appid=247080&steamid=" + id, "steam").Playerstats);
             }
-            return (JsonConvert.DeserializeObject<Leaderboard[]>(File.ReadAllText(@"Leaderboards.json")));
+            catch
+            {
+                return (new PlayerStats());
+            }
         }
 
-        public static LeaderboardEntries GetLeaderboardEntries(int lbId, int offset)
+        public static PlaytimeResponse GetPlaytime(string id) // https://developer.valvesoftware.com/wiki/Steam_Web_API#GetOwnedGames_.28v0001.29
         {
-            string lboard = "leaderboards/" + lbId + "/entries?offset=" + offset;
-            return (ServerGet<LeaderboardEntries>(lboard));
+            PlaytimeResponse a = ServerGet<SteamResponse>("IPlayerService/GetOwnedGames/v0001/?steamid=" + id, "steam").Response;
+            return (a);
         }
-
-        public static void RegisterLeaderboards()
-        {
-            Leaderboard[] response = ServerGet<Leaderboard[]>("leaderboards/primaries");
-
-            File.WriteAllText(@"Leaderboards.json", JsonConvert.SerializeObject(response, Formatting.Indented));
-            Console.WriteLine("[Leaderboards registered to Leaderboards.json]");
-        }
-
-        public static PlayerResults GetPlayerResults(string q)
-        {
-            return (ServerGet<PlayerResults>("players?q=" + q));
-        }
-
-        public static PlayerEntries GetPlayerEntries(string id)
-        {
-            return (ServerGet<PlayerEntries>("players/" + id + "/entries"));
-        }
-
 
     }
 }
