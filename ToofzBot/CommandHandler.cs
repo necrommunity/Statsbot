@@ -303,7 +303,7 @@ namespace ToofzBot
             Entry en = null;
 
             sb.Append("Displaying leaderboard results for " + lb.Display_name + "\n\n");
-            for (int i = offset; i < offset + 15 && i < (leaderboard.Entries.GetLength(0)); i++)
+            for (int i = offset; i < leaderboard.Entries[leaderboard.Entries.GetLength(0)-1].Rank && i < (offset + 15); i++)
             {
                 en = leaderboard.Entries[i - offset];
 
