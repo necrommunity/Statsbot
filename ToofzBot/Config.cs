@@ -13,11 +13,6 @@ namespace ToofzBot
         public string SteamKey { get; set; }
         public string DiscordToken { get; set; }
 
-        public static void WriteConfig(Config config)
-        {
-            File.WriteAllText(@"Config.json", JsonConvert.SerializeObject(config, Formatting.Indented));
-        }
-
         public Config()
         {
             SteamKey = "";
@@ -27,8 +22,11 @@ namespace ToofzBot
         public static Config ReadConfig()
         {
             if (!File.Exists(@"Config.json"))
-                WriteConfig(new Config());
-            return( JsonConvert.DeserializeObject<Config>(File.ReadAllText(@"Config.json")));
+            {
+                Console.WriteLine("Config.json created.");
+                File.WriteAllText(@"Config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented));
+            }
+            return (JsonConvert.DeserializeObject<Config>(File.ReadAllText(@"Config.json")));
         }
     }
 }
