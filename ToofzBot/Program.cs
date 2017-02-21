@@ -13,9 +13,11 @@ namespace ToofzBot
     {
 
         public static Config config;
+        public static Racebot racebot;
 
         static void Main(string[] args)
         {
+
             new Program().Start();
         }
 
@@ -26,7 +28,7 @@ namespace ToofzBot
 
             client = new DiscordClient(x =>
             {
-                x.AppName = "ToofzBot";
+                x.AppName = "Toofzbot";
                 x.LogLevel = LogSeverity.Info;
                 x.LogHandler = Log;
             });
@@ -40,6 +42,7 @@ namespace ToofzBot
 
             CreateCommands();
 
+            racebot = new Racebot();
             config = Config.ReadConfig();
 
             if (config.DiscordToken == "" || config.SteamKey == "")
@@ -48,7 +51,6 @@ namespace ToofzBot
                 Console.ReadKey();
                 return;
             }
-
             client.ExecuteAndWait(async () => await client.Connect(config.DiscordToken, TokenType.Bot));
 
         }
@@ -64,6 +66,12 @@ namespace ToofzBot
                     var toReturn = CommandHandler.ToofzCommand(e.GetArg(0));
                     await e.Channel.SendMessage("```" + toReturn + "```");
                 });
+            //cService.CreateCommand("rename")
+            //    .Parameter("arg", ParameterType.Unparsed)
+            //    .Do(async (e) =>
+            //    {
+            //        await client.CurrentUser.Edit(username: "name");
+            //    });
             cService.CreateCommand("stats")
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
@@ -72,26 +80,26 @@ namespace ToofzBot
                     await e.Channel.SendMessage("```" + toReturn + "```");
                 });
             cService.CreateCommand("penguin")
+                .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
                     await e.Channel.SendMessage("```ᕕ(' >')ᕗᕕ(' >')ᕗᕕ(' >')ᕗ" + "\npls no bulli```");
                 });
-            cService.CreateCommand("help")
+            cService.CreateCommand("condorbotstatus")
+                .Alias(new string[] { "register", "timezone" })
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("```ToofzBot is a bot which retrieves Crypt of the Necrodancer player info."
-                + "\n\tAvailable commands: \".toofz search\", \".toofz leaderboard\", \".stats\"."
-                + "\nPing Naymin#5067 for questions and bug reports.```");
+                    bool cbot = (e.Channel.Name == "season5" && e.Server.GetUser("condorbot", 0).Status != UserStatus.Online);
+                    await e.Channel.SendMessage("`Condorbot is currently offline. Please register later.`");
                 });
-            //cService.CreateCommand("test")
-            //    .Description("aaa.")
-            //    .Parameter("arg", ParameterType.Unparsed)
-            //    .Do(async (e) =>
-            //    {
-            //        var toReturn = CommandHandler.SearchLeaderboard(e.GetArg(0));
-            //        await e.Channel.SendMessage(toReturn);
-            //    });
+            cService.CreateCommand("necrobot")
+                .Parameter("arg", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    var toReturn = racebot.DisplayResults(e.User.Id.ToString(), e.GetArg(0));
+                    await e.Channel.SendMessage("```" + toReturn + "```");
+                });
         }
 
         public void Log(object sender, LogMessageEventArgs e)

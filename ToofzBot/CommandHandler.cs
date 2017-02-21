@@ -88,10 +88,10 @@ namespace ToofzBot
                     q = q.Replace("help ", null);
                     return HelpCommand(q);
                 case "info":
-                    return ("ToofzBot v0.84. Type \"help\" for a list of commands.");
+                    return ("Toofzbot v0.85. Type \".toofz help\" for a list of commands.");
                 default:
-                    return ("Unknown command. Use \"search\", \"leaderboard\", or \"help <command>\" for more information.\n" 
-                        + "Tip: you can use commands in private messages too.");
+                    return ("Unknown command. Use \"help <command>\" for more information.\n"
+                        + "Tip: you can use commands in private messages.");
             }
         }
 
@@ -106,9 +106,16 @@ namespace ToofzBot
                     + "\nType \".toofz leaderboard <character>: <category>\" to see a leaderboard."
                     + "\nAdd \"classic\" before the character name to see results without Amplified."
                     + "\nAdd \"&<rank>\" or \"offset=<rank>\" to see the result starting at the specified offset.");
+            if (q.StartsWith("stats"))
+                return ("Displays a steam user's stats."
+                    + "\nType \".stats <profile name> to display said user's stats.");
+            if (q.StartsWith("necrobot"))
+                return ("Displays a user's recorded necrobot races."
+                    + "\nType \".necrobot <user>\" to see past races."
+                    + "\nAdd \"&<offset>\" to see the older results.");
             return ("ToofzBot is a bot which retrieves Crypt of the Necrodancer player stats."
-                + "\n\tAvailable commands: \"search\", \"leaderboard\", \"info\"."
-                + "\nUse \"search\", \"leaderboard\", or \"help <command>\" for more information."
+                + "\n\tAvailable commands: \"search\", \"leaderboard\", \"stats\", \"necrobot\", \"info\"."
+                + "\nUse \".toofz help <command>\" for more information."
                 + "\nPing Naymin#5067 for questions and bug reports.");
         }
 
@@ -251,7 +258,7 @@ namespace ToofzBot
         {
 
             if (!q.Contains(":"))
-                return ("Please enter a specific leaderboard in the form of \"-leaderboard <character>: <type> &<offset>\".");
+                q = q + ":speed";
 
             bool amplified = true;
             if (q.StartsWith("classic"))
@@ -303,7 +310,7 @@ namespace ToofzBot
             Entry en = null;
 
             sb.Append("Displaying leaderboard results for " + lb.Display_name + "\n\n");
-            for (int i = offset; i < leaderboard.Entries[leaderboard.Entries.GetLength(0)-1].Rank && i < (offset + 15); i++)
+            for (int i = offset; i < leaderboard.Entries[leaderboard.Entries.GetLength(0) - 1].Rank && i < (offset + 15); i++)
             {
                 en = leaderboard.Entries[i - offset];
 
