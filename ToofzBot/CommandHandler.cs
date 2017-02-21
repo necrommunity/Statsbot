@@ -90,7 +90,8 @@ namespace ToofzBot
                 case "info":
                     return ("ToofzBot v0.84. Type \"help\" for a list of commands.");
                 default:
-                    return ("Unknown command. Use \"search\", \"leaderboard\", or \"help <command>\" for more information.");
+                    return ("Unknown command. Use \"search\", \"leaderboard\", or \"help <command>\" for more information.\n" 
+                        + "Tip: you can use commands in private messages too.");
             }
         }
 
@@ -302,7 +303,7 @@ namespace ToofzBot
             Entry en = null;
 
             sb.Append("Displaying leaderboard results for " + lb.Display_name + "\n\n");
-            for (int i = offset; i < (leaderboard.Entries.GetLength(0)) && i < offset + 15; i++)
+            for (int i = offset; i < leaderboard.Entries[leaderboard.Entries.GetLength(0)-1].Rank && i < (offset + 15); i++)
             {
                 en = leaderboard.Entries[i - offset];
 
