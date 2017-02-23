@@ -1,6 +1,6 @@
-# ToofzBot
-Discord bot created for the CoNDOR server. Fetches and formats Crypt of the Necrodancer stats from the steam servers and the toofz api (http://api.toofz.com/help).
+# Statsbot
+Discord bot created for the CoNDOR server. Fetches and formats Crypt of the Necrodancer stats from the steam servers, toofz api and the necrobot database.
 
 ###To do list:
-- Stick comments on everything.
-
+- Proper documentation
+- Add replay files parsing

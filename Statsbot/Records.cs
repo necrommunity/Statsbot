@@ -6,15 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace ToofzBot
+namespace Statsbot
 {
 
-    public class StatsResponse
+    public class RecordsResponse
     {
-        public PlayerStats Playerstats { get; set; }
+        public Records Playerstats { get; set; }
     }
 
-    public class PlayerStats
+    public class Records
     {
         public static string[] Characters = new string[12];
         public static Dictionary<string, string> Names { get; set; } = new Dictionary<string, string>()
@@ -30,7 +30,7 @@ namespace ToofzBot
         public Stat[] Stats { get; set; }
         public Dictionary<string, int> Organized { get; set; } = new Dictionary<string, int>();
 
-        public void OrganizeStats()
+        public void Organize()
         {
             foreach (string s in Names.Values)
             {

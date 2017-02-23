@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ToofzBot
+namespace Statsbot
 {
-    public class Leaderboard
+    public class ToofzBoard
     {
         public int ID { get; set; }
         public string Product { get; set; }

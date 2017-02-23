@@ -7,8 +7,8 @@
     <ProjectGuid>{E1143721-AE21-48D9-87CA-08C9AE22AE83}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ToofzBot</RootNamespace>
-    <AssemblyName>ToofzBot</AssemblyName>
+    <RootNamespace>Statsbot</RootNamespace>
+    <AssemblyName>Statsbot</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -85,23 +85,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Category.cs" />
     <Compile Include="CommandHandler.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="DbConfig.cs" />
-    <Compile Include="Entry.cs" />
+    <Compile Include="Database.cs" />
     <Compile Include="ApiSender.cs" />
-    <Compile Include="LeaderboardEntries.cs" />
-    <Compile Include="LeaderboardResults.cs" />
+    <Compile Include="Entry.cs" />
+    <Compile Include="Leaderboard.cs" />
+    <Compile Include="SteamUser.cs" />
+    <Compile Include="ToofzBoard.cs" />
     <Compile Include="PlayerEntry.cs" />
     <Compile Include="Player.cs" />
-    <Compile Include="Leaderboard.cs" />
-    <Compile Include="PlayerStats.cs" />
+    <Compile Include="Records.cs" />
     <Compile Include="Playtime.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Racebot.cs" />
-    <Compile Include="RaceData.cs" />
-    <Compile Include="RacerData.cs" />
+    <Compile Include="XmlParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

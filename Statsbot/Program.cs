@@ -7,17 +7,17 @@ using System.Globalization;
 using Discord;
 using Discord.Commands;
 
-namespace ToofzBot
+namespace Statsbot
 {
     class Program
     {
 
         public static Config config;
+        public static Database database;
         public static Racebot racebot;
 
         static void Main(string[] args)
         {
-
             new Program().Start();
         }
 
@@ -28,7 +28,7 @@ namespace ToofzBot
 
             client = new DiscordClient(x =>
             {
-                x.AppName = "Toofzbot";
+                x.AppName = "Statsbot";
                 x.LogLevel = LogSeverity.Info;
                 x.LogHandler = Log;
             });
@@ -42,15 +42,25 @@ namespace ToofzBot
 
             CreateCommands();
 
-            racebot = new Racebot();
             config = Config.ReadConfig();
+            database = Database.ReadConfig();
+            XmlParser.lbInfo = XmlParser.ParseIndex();
 
             if (config.DiscordToken == "" || config.SteamKey == "")
             {
-                Console.Write("Please enter the bot's Discord token and the steam api key in Config.json before launch.");
+                Console.Write("Please make sure the bot's discord token and steam api key in Config.json are entered correctly before launch.");
                 Console.ReadKey();
                 return;
             }
+
+            if(database.Server == "")
+            {
+                Console.Write("Please make sure the Necrobot's database credentials in Database.json are entered correctly before launch.");
+                Console.ReadKey();
+                return;
+            }
+            racebot = new Racebot();
+
             client.ExecuteAndWait(async () => await client.Connect(config.DiscordToken, TokenType.Bot));
 
         }
@@ -59,24 +69,11 @@ namespace ToofzBot
         {
             var cService = client.GetService<CommandService>();
 
-            cService.CreateCommand("toofz")
+            cService.CreateCommand("statsbot")
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    var toReturn = CommandHandler.ToofzCommand(e.GetArg(0));
-                    await e.Channel.SendMessage("```" + toReturn + "```");
-                });
-            //cService.CreateCommand("rename")
-            //    .Parameter("arg", ParameterType.Unparsed)
-            //    .Do(async (e) =>
-            //    {
-            //        await client.CurrentUser.Edit(username: "name");
-            //    });
-            cService.CreateCommand("stats")
-                .Parameter("arg", ParameterType.Unparsed)
-                .Do(async (e) =>
-                {
-                    var toReturn = CommandHandler.SearchPlayerStats(e.GetArg(0));
+                    var toReturn = CommandHandler.ParseRequest(e.GetArg(0), e.User);
                     await e.Channel.SendMessage("```" + toReturn + "```");
                 });
             cService.CreateCommand("penguin")
@@ -85,21 +82,12 @@ namespace ToofzBot
                 {
                     await e.Channel.SendMessage("```ᕕ(' >')ᕗᕕ(' >')ᕗᕕ(' >')ᕗ" + "\npls no bulli```");
                 });
-            cService.CreateCommand("condorbotstatus")
-                .Alias(new string[] { "register", "timezone" })
-                .Parameter("arg", ParameterType.Unparsed)
-                .Do(async (e) =>
-                {
-                    bool cbot = (e.Channel.Name == "season5" && e.Server.GetUser("condorbot", 0).Status != UserStatus.Online);
-                    await e.Channel.SendMessage("`Condorbot is currently offline. Please register later.`");
-                });
-            cService.CreateCommand("necrobot")
-                .Parameter("arg", ParameterType.Unparsed)
-                .Do(async (e) =>
-                {
-                    var toReturn = racebot.DisplayResults(e.User.Id.ToString(), e.GetArg(0));
-                    await e.Channel.SendMessage("```" + toReturn + "```");
-                });
+            //cService.CreateCommand("rename")
+            //    .Parameter("arg", ParameterType.Unparsed)
+            //    .Do(async (e) =>
+            //    {
+            //        await client.CurrentUser.Edit(username: "Statsbot");
+            //    });
         }
 
         public void Log(object sender, LogMessageEventArgs e)

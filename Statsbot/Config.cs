@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace ToofzBot
+namespace Statsbot
 {
     public class Config
     {
@@ -23,7 +23,7 @@ namespace ToofzBot
         {
             if (!File.Exists(@"Config.json"))
             {
-                Console.WriteLine("Config.json created.");
+                Console.WriteLine("Config.json created. Please fill in the keys.");
                 File.WriteAllText(@"Config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented));
             }
             return (JsonConvert.DeserializeObject<Config>(File.ReadAllText(@"Config.json")));
