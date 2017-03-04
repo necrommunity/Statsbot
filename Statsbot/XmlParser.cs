@@ -20,7 +20,7 @@ namespace Statsbot
         public static void RegisterLeaderboards(Dictionary<Category, Leaderboard> lbInfo)
         {
             File.WriteAllText(@"Leaderboards.json", JsonConvert.SerializeObject(lbInfo, Newtonsoft.Json.Formatting.Indented));
-        }
+        }    
 
         public static Dictionary<Category, Leaderboard> ParseIndex()
         {
@@ -92,14 +92,14 @@ namespace Statsbot
             if (doc.DocumentElement.ChildNodes[6].Name == "nextRequestURL")
                 i = 8;
 
-            foreach (XmlNode n in doc.DocumentElement.ChildNodes[i])
+                foreach (XmlNode n in doc.DocumentElement.ChildNodes[i])
             {
-                Entry en = new Entry();
+                    Entry en = new Entry();
 
-                foreach (XmlNode e in n)
-                {
-                    switch (e.Name)
+                    foreach (XmlNode e in n)
                     {
+                        switch (e.Name)
+                        {
                         case "steamid":
                             en.Steamid = e.InnerText;
                             break;
@@ -112,10 +112,10 @@ namespace Statsbot
                         case "ugcid":
                             en.UgcID = e.InnerText;
                             break;
+                        }
                     }
-                }
 
-                list.Add(en);
+                    list.Add(en);
             }
             return list;
         }

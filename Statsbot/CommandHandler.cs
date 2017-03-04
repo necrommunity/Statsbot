@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Discord;
 
 namespace Statsbot
 {
@@ -10,42 +11,88 @@ namespace Statsbot
     public static class CommandHandler
     {
 
-        public static string Help(string q)
+        public static string ParseRequest(string q, User user)
+        {
+
+            if (q.Contains("​")) //gets rid of invisible character
+                q = q.Replace("​", null);
+
+            q = q.ToLower();
+
+            string str = q.Split(' ')[0];
+
+            switch (str)
+            {
+                case "version":
+                    return ("Statsbot v0.77. Type \".statsbot help\" for a list of commands.");
+                case "help":
+                    q = q.Replace("help ", null);
+                    return (HelpCommand(q));
+                case "search":
+                    q = q.Replace("search ", null);
+                    return (Search(q));
+                case "player":
+                    q = q.Replace("player ", null);
+                    return (Search(q));
+                case "toofz":
+                    q = q.Replace("toofz ", null);
+                    return (Search(q));
+                case "records":
+                    q = q.Replace("records ", null);
+                    return (Records(q));
+                case "stats":
+                    q = q.Replace("stats ", null);
+                    return (Records(q));
+                case "leaderboard":
+                    q = q.Replace("leaderboard ", null);
+                    return (Leaderboard(q));
+                case "necrobot":
+                    q = q.Replace("necrobot", null);
+                    return (Program.racebot.DisplayResults(user.Name, q));
+                default:
+                    return ("Unknown command. Type \".statsbot help\" for a list of commands.\n"
+                        + "Tip: you can use commands in private messages.");
+            }
+        }
+
+        public static string HelpCommand(string q)
         {
             if (q.StartsWith("search") || q.StartsWith("player") || q.StartsWith("toofz"))
                 return ("Searches for players and their top scores."
                     + "\nType \".statsbot search <name>\" to see a list of search results, or \".statsbot search <name>: <category>\" to see results for a specific category."
                     + "\nSteamID can be used instead of a name (\".statsbot search #245356: seeded score\").");
-            if (q.StartsWith("leaderboard") || q.StartsWith("lb"))
+            if (q.StartsWith("leaderboard"))
                 return ("Displays a leaderboard."
                     + "\nType \".statsbot leaderboard <character>: <category>\" to see a leaderboard."
-                    + "\nAdd \"classic\" before the category to see results without the dlc."
-                    + "\nAdd \"&<offset>\" after the category to see the result starting at the specified offset.");
+                    + "\nAdd \"classic\" before the character name to see results without the dlc."
+                    + "\nAdd \"&<rank>\" after the category to see the result starting at the specified offset.");
             if (q.StartsWith("records") || q.StartsWith("stats"))
                 return ("Displays a steam user's stats."
                     + "\nType \".stats <profile name> to display said user's stats.");
-            if (q.StartsWith("necrobot") || q.StartsWith("races"))
+            if (q.StartsWith("necrobot"))
                 return ("Displays a user's recorded necrobot races."
                     + "\nType \".statsbot necrobot <user>\" to see past races."
                     + "\nAdd \"&<offset>\" to see older results.");
             if (q.StartsWith("version"))
                 return ("Displays the bot's current version.");
             return ("Statsbot is a bot which retrieves Crypt of the Necrodancer player stats."
-                + "\n\nAvailable commands: \"search/player/toofz\", \"leaderboard/lb\", \"records/stats\", \"necrobot/races\", \"version\"."
-                + "\nUse \".statsbot help <command>\" to expand on a command."
-                + "\n\nFull documentation is available at https://github.com/necrommunity/Statsbot"
-                + "\nContact Naymin#5067 for feedback and bug reports."
-                );
+                + "\n\tAvailable commands: \"search\", \"leaderboard\", \"records\", \"necrobot\", \"version\"."
+                + "\nUse \".statsbot help <command>\" for more information."
+                + "\nPing Naymin#5067 for questions and bug reports.");
         }
 
         public static string Search(string q)
         {
             StringBuilder sb = new StringBuilder();
-            if (!q.Contains(":")) //if the search isnt specified
+            bool isID = q.StartsWith("#");
+            if (isID)
+                q = q.Replace("#", null);
+
+            if (!q.Contains(":") && !isID) //if the search isnt specified
             {
                 PlayerNames players = ApiSender.GetNames(q);
 
-                if (players.Players.Length == 0)
+                if (players.Players.GetLength(0) == 0)
                     return ("No results found for \"" + q + "\".");
 
                 sb.Append("Displaying top players for \"" + q + "\"\n\n");
@@ -96,12 +143,12 @@ namespace Statsbot
 
             PlayerEntries playerEntries = new PlayerEntries();
 
-            bool id = name.StartsWith("#");
-            if (id)
-            {
+            bool isID = name.StartsWith("#");
+            if (isID)
                 name = name.Replace("#", null);
+
+            if (isID)
                 playerEntries = ApiSender.GetPlayerScores(name);
-            }
 
             else
             {
@@ -110,18 +157,10 @@ namespace Statsbot
                     playerEntries = ApiSender.GetPlayerScores(results.Players[0].ID);
             }
 
-            if (playerEntries.Player == null || playerEntries.Entries.Length == 0)
+            if (playerEntries == new PlayerEntries())
                 return ("Couldn't find results for \"" + name + "\".");
-
-            string product = "Amplified";
-            if (type.Contains("amplified"))
-                type = type.Replace("amplified", null);
-            if (type.Contains("classic"))
-            {
-                product = "Classic";
-                type = type.Replace("classic", null);
-                type = type.Trim();
-            }
+            if (playerEntries.Entries.Length == 0)
+                return ("No entries found for " + name + " in the category " + type + ".");
 
             StringBuilder sb = new StringBuilder();
 
@@ -131,7 +170,7 @@ namespace Statsbot
 
             foreach (PlayerEntry en in playerEntries.Entries)
             {
-                if (type.Equals(en.Leaderboard.Run, StringComparison.OrdinalIgnoreCase) && en.Leaderboard.Product == product)
+                if (type.Equals(en.Leaderboard.Run, StringComparison.OrdinalIgnoreCase))
                 {
                     sb.Append("\t" + en.Leaderboard.Character + " (" + en.Leaderboard.Product + ")");
                     for (int i = en.Leaderboard.Character.Length + en.Leaderboard.Product.Length; i < 17; i++)
@@ -167,40 +206,30 @@ namespace Statsbot
             sb.Append("Green bats killed: " + stats["bats"] + "\n");
             sb.Append("Zone clears: " + stats["z1"] + " | " + stats["z2"] + " | " + stats["z3"] + " | " + stats["z4"] + "\n");
             sb.Append("Character clears ");
-            bool nl = true;
-            foreach (string s in (Enum.GetNames(typeof(Character))))
+            foreach (string s in Statsbot.Records.Characters)
             {
                 if (stats[s] != 0)
                 {
-                    if (nl)
-                        sb.Append("\n   " + s);
-                    else
-                        sb.Append("\t" + s);
-                    for (int i = s.Length + Digits(stats[s]); i < 14; i++)
+                    sb.Append("\n   " + s);
+                    for (int i = s.Length; i < 10; i++)
                     { sb.Append(" "); }
                     sb.Append(stats[s]);
                     switch (s)
                     {
                         case "Cadence":
-                            sb.Append(" -  " + stats["speedruns"] + " sub-15, " + stats["dailies"] + " dailies");
-                            nl = false;
+                            sb.Append(" (" + stats["speedruns"] + " sub-15, " + stats["dailies"] + " dailies)");
                             break;
                         case "Aria":
-                            sb.Append(" -  " + stats["ariaLow"] + " low%");
-                            nl = false;
+                            sb.Append(" (" + stats["ariaLow"] + " low%)");
                             break;
                         case "All":
-                            sb.Append(" -  " + stats["lowest"] + " low%");
-                            nl = false;
+                            sb.Append(" (" + stats["lowest"] + " low%)");
                             break;
                     }
-                    if (nl == true)
-                        nl = false;
-                    else
-                        nl = true;
                 }
             }
             return sb.ToString();
+
         }
 
         public static string Leaderboard(string q)
@@ -212,6 +241,11 @@ namespace Statsbot
             Category lb = new Category();
 
             string character = q.Split(new[] { ':' })[0];
+            if (character.Contains("classic"))
+            {
+                lb.Amplified = false;
+                character = character.Replace("classic", null);
+            }
             character = character.Replace(" ", null);
             for (int i = 0; i < 14; i++)
             {
@@ -241,23 +275,11 @@ namespace Statsbot
                 type = type.Split(new[] { '&' })[0];
             }
 
-            if (type.Contains("classic"))
-            {
-                lb.Amplified = false;
-                type = type.Replace("classic", null);
-            }
-
-            if (type.Contains("amplified"))
-            {
-                type = type.Replace("amplified", null);
-            }
-
             if (type.Contains("seeded"))
             {
                 lb.Seeded = true;
                 type = type.Replace("seeded", null);
             }
-
 
             type = type.Trim();
 
@@ -271,10 +293,10 @@ namespace Statsbot
                     break;
                 }
             }
-            return LeaderboardString(lb, offset);
+            return DisplayLeaderboard(lb, offset);
         }
 
-        public static string LeaderboardString(Category category, int offset)
+        public static string DisplayLeaderboard(Category category, int offset)
         {
             Leaderboard lb = new Leaderboard();
 
@@ -288,7 +310,7 @@ namespace Statsbot
                 return ("No entries found for " + lb.DisplayName + " ( offset = " + offset + " ).");
 
             StringBuilder sb = new StringBuilder();
-            int digitR = Digits(offset + 10);
+            int digitR = Digits(offset + 15);
 
             sb.Append("Displaying results for " + lb.DisplayName + "\n\n");
             foreach (Entry en in entries)
@@ -362,7 +384,7 @@ namespace Statsbot
                     if (amplified)
                         return (sb.ToString() + wins + " (" + (5 - (score / 10)) + "-" + (score % 10 + 1) + ")");
                     else
-                        return (sb.ToString() + wins + " (" + (4 - (score / 10)) + "-" + (score % 10 + 1) + ")");
+                        return (sb.ToString() + wins + " (" + (4 - (score / 10 + 1)) + "-" + (score % 10 + 1) + ")");
                 default:
                     return "error";
             }

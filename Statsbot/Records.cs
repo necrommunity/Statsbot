@@ -16,6 +16,7 @@ namespace Statsbot
 
     public class Records
     {
+        public static string[] Characters = new string[12];
         public static Dictionary<string, string> Names { get; set; } = new Dictionary<string, string>()
         { { "NumDeaths",  "deaths"}, { "NumShopkeeperKills", "freddies" },{ "NumGreenBatKills", "bats" }, {"NumZone1Completions", "z1" },
             { "NumZone2Completions", "z2" },{"NumZone3Completions", "z3" },{"NumZone4Completions", "z4" },{"NumSub8CadenceSpeedruns", "speedruns" },
@@ -23,8 +24,8 @@ namespace Statsbot
             {"NumHardcoreCompletionsBard", "Bard" }, {"NumHardcoreCompletionsBolt", "Bolt" }, {"NumHardcoreCompletionsMonk", "Monk" },
             { "NumHardcoreCompletionsDove", "Dove" },{"NumHardcoreCompletionsEli", "Eli" }, { "NumHardcoreCompletionsMelody", "Melody" },
             { "NumHardcoreCompletionsDorian", "Dorian" }, {"NumHardcoreCompletionsCoda", "Coda" }, { "NumHardcoreCompletionsNocturna", "Nocturna" },
-            { "NumAllCharsCompletions", "All" }, {"NumAriaLowPercentCompletions", "ariaLow" },{"NumAllCharsLowPercentCompletions", "lowest" }, {"story", "Story" } };
-
+            { "NumAllCharsCompletions", "All" }, {"NumAriaLowPercentCompletions", "ariaLow" },{"NumAllCharsLowPercentCompletions", "lowest" } };
+        
         public string SteamID { get; set; }
         public Stat[] Stats { get; set; }
         public Dictionary<string, int> Organized { get; set; } = new Dictionary<string, int>();
@@ -40,6 +41,7 @@ namespace Statsbot
                 if (Names.ContainsKey(s.Name))
                     Organized[Names[s.Name]] = s.Value;
             }
+            Array.Copy(Names.Values.ToArray(), 9, Characters, 0, 12);
         }
     }
 
