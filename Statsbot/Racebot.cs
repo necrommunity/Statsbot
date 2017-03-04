@@ -15,7 +15,6 @@ namespace Statsbot
 
         public string GetResults(string user, int offset)
         {
-            //string c = "Server=necrobot.condorleague.tv;Database=necrobot;Uid=necrobot-read;Pwd=necrobot-read;";
             StringBuilder sb = new StringBuilder();
             using (Connection)
             {
@@ -27,7 +26,7 @@ namespace Statsbot
                         + "' AND racer_data.discord_id=user_data.discord_id AND race_data.race_id=racer_data.race_id ORDER BY race_data.race_id DESC", Connection);
                     using (MySqlDataReader r = comm.ExecuteReader())
                     {
-                        for (int i = 0; i < (offset + 10) && r.Read(); i++) //while havn't reached end of reader
+                        for (int i = 0; i < (offset + 5) && r.Read(); i++) //while havn't reached end of reader
                         {
                             if (i >= offset) //starts reading at specified offset
                             {
@@ -41,7 +40,7 @@ namespace Statsbot
                                 if (r[7].ToString() != "-2")
                                     sb.Append(" (f) ");
                                 else
-                                    sb.Append("    ");
+                                    sb.Append("     ");
                                 sb.Append(r[6] + "\n");
                             }
                         }
@@ -81,7 +80,7 @@ namespace Statsbot
 
             string results = GetResults(user, offset);
             if (results == "")
-                return ("No necrobot results found for " + user + ".");
+                return ("No necrobot results found for \"" + user + "\".");
 
             StringBuilder sb = new StringBuilder();
             sb.Append("Displaying requested necrobot results for " + user + " \n\n");

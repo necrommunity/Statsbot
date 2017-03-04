@@ -38,7 +38,8 @@ namespace Statsbot
 
         public static PlayerNames GetNames(string q)
         {
-            return (ServerGet<PlayerNames>("players?q=" + q, "toofz"));
+            PlayerNames a = ServerGet<PlayerNames>("players?q=" + q, "toofz");
+            return (a);
         }
 
         public static PlayerEntries GetPlayerScores(string id)
@@ -73,7 +74,7 @@ namespace Statsbot
                     if (id == "")
                         response = client.DownloadString("http://steamcommunity.com/stats/247080/leaderboards/?xml=1");
                     else
-                        response = client.DownloadString("http://steamcommunity.com/stats/247080/leaderboards/" + id + "/?xml=1&start=" + offset + "&end=" + (offset + 14));
+                        response = client.DownloadString("http://steamcommunity.com/stats/247080/leaderboards/" + id + "/?xml=1&start=" + offset + "&end=" + (offset + 9));
                 }
             }
             catch
