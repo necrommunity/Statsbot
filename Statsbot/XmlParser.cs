@@ -52,6 +52,10 @@ namespace Statsbot
                                     lb.Category.Amplified = false;
                                 if (s.Contains("Seeded"))
                                     lb.Category.Seeded = true;
+                                if (s.Contains("Hard"))
+                                    lb.Category.Mode = Mode.Hard;
+                                if (s.Contains("Return"))
+                                    lb.Category.Mode = Mode.NoReturn;
                                 for (int i = 0; i < 3; i++)
                                 {
                                     if (s.Contains(Enum.GetNames(typeof(RunType))[i]))
@@ -60,7 +64,7 @@ namespace Statsbot
                                         break;
                                     }
                                 }
-                                for (int i = 0; i < 13; i++)
+                                for (int i = 0; i < 14; i++)
                                 {
                                     if (s.Contains(Enum.GetNames(typeof(Character))[i]))
                                     {

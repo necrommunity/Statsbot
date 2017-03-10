@@ -137,7 +137,7 @@ namespace Statsbot
 
         public void UnknownCommand(object sender, CommandErrorEventArgs e)
         {
-            e.Channel.SendMessage("```Unknown command \"" + e.Message.RawText[0] + "\". Type \".statsbot help\" for a list of commands.\n"
+            e.Channel.SendMessage("```Unknown command \"" + e.Message.RawText.Split(' ')[0] + "\". Type \".statsbot help\" for a list of commands.\n"
                         + "Tip: you can use commands in private messages.```");
         }
 

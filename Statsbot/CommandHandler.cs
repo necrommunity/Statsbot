@@ -252,6 +252,21 @@ namespace Statsbot
                 type = type.Replace("amplified", null);
             }
 
+            if(type.Contains("return"))
+            {
+                type = type.Replace("return", null);
+                type = type.Replace("no return", null);
+                lb.Mode = Mode.NoReturn;
+            }
+
+            if(type.Contains("hard"))
+            {
+                type = type.Replace("hard", null);
+                type = type.Replace("hardmode", null);
+                type = type.Replace("hard mode", null);
+                lb.Mode = Mode.Hard;
+            }
+
             if (type.Contains("seeded"))
             {
                 lb.Seeded = true;

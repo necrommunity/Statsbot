@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 namespace Statsbot
 {
 
-    public enum Character { All, Aria, Bard, Bolt, Cadence, Coda, Dorian, Dove, Eli, Melody, Monk, Nocturna, Story }
+    public enum Character { All, Aria, Bard, Bolt, Cadence, Coda, Diamond, Dorian, Dove, Eli, Melody, Monk, Nocturna, Story }
     public enum RunType { Deathless, Score, Speed }
+    public enum Mode { Standard, Hard, NoReturn }
 
     public class Category
     {
@@ -16,13 +17,14 @@ namespace Statsbot
         public bool Seeded { get; set; }
         public Character Char { get; set; }
         public RunType Type { get; set; }
+        public Mode Mode { get; set; } = Mode.Standard;
 
         public override bool Equals(object obj)
         {
             if (obj == null || GetType() != obj.GetType())
                 return false;
             Category compare = obj as Category;
-            if (Amplified == compare.Amplified && Seeded == compare.Seeded && Char == compare.Char && Type == compare.Type)
+            if (Amplified == compare.Amplified && Seeded == compare.Seeded && Char == compare.Char && Type == compare.Type && Mode == compare.Mode)
                 return true;
             else
                 return false;

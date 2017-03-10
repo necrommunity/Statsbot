@@ -23,7 +23,7 @@ namespace Statsbot
             {"NumHardcoreCompletionsBard", "Bard" }, {"NumHardcoreCompletionsBolt", "Bolt" }, {"NumHardcoreCompletionsMonk", "Monk" },
             { "NumHardcoreCompletionsDove", "Dove" },{"NumHardcoreCompletionsEli", "Eli" }, { "NumHardcoreCompletionsMelody", "Melody" },
             { "NumHardcoreCompletionsDorian", "Dorian" }, {"NumHardcoreCompletionsCoda", "Coda" }, { "NumHardcoreCompletionsNocturna", "Nocturna" },
-            { "NumAllCharsCompletions", "All" }, {"NumAriaLowPercentCompletions", "ariaLow" },{"NumAllCharsLowPercentCompletions", "lowest" }, {"story", "Story" } };
+            { "NumAllCharsCompletions", "All" }, {"NumAriaLowPercentCompletions", "ariaLow" },{"NumAllCharsLowPercentCompletions", "lowest" }, {"story", "Story" }, {"diamond", "Diamond" } };
 
         public string SteamID { get; set; }
         public Stat[] Stats { get; set; }
