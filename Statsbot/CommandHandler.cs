@@ -21,7 +21,7 @@ namespace Statsbot
                     + "\nType \".statsbot leaderboard <character>: <category>\" to see a leaderboard."
                     + "\nAdd \"classic\" before the category to see results without the dlc."
                     + "\nAdd \"&<offset>\" after the category to see the result starting at the specified offset.");
-            if (q.StartsWith("records") || q.StartsWith("stats"))
+            if (q.StartsWith("record") || q.StartsWith("stats"))
                 return ("Displays a steam user's stats."
                     + "\nType \".stats <profile name> to display said user's stats.");
             if (q.StartsWith("necrobot") || q.StartsWith("races"))
@@ -163,7 +163,7 @@ namespace Statsbot
             sb.Append("SteamID: " + player.ID + "\n");
             sb.Append("Total playtime: " + time.Playtime_forever / 60 + " hours (" + time.Playtime_2weeks / 60 + " recently)\n\n");
 
-            sb.Append("Deaths: " + stats["deaths"] + " (" + (stats["deaths"] / (float)(time.Playtime_forever / 60)) + " per hour)\n");
+            sb.Append("Deaths: " + stats["deaths"] + " (" + (stats["deaths"] / (float)(time.Playtime_forever / 60)) + " per hour, Cadence only)\n");
             sb.Append("Green bats killed: " + stats["bats"] + "\n");
             sb.Append("Zone clears: " + stats["z1"] + " | " + stats["z2"] + " | " + stats["z3"] + " | " + stats["z4"] + "\n");
             sb.Append("Character clears ");

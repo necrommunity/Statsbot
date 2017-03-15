@@ -101,7 +101,7 @@ namespace Statsbot
                     await e.Channel.SendMessage("```" + CommandHandler.Search(e.GetArg(0).ToLower()) + "```");
                 });
             cService.CreateCommand("records")
-                .Alias(new string[] { "stats" })
+                .Alias(new string[] { "stats", "record" })
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
@@ -137,7 +137,7 @@ namespace Statsbot
 
         public void UnknownCommand(object sender, CommandErrorEventArgs e)
         {
-            e.Channel.SendMessage("```Unknown command \"" + e.Message.RawText.Split(' ')[0] + "\". Type \".statsbot help\" for a list of commands.\n"
+            e.Channel.SendMessage("```Unknown command \"" + e.Message.RawText.Split(' ')[1] + "\". Type \".statsbot help\" for a list of commands.\n"
                         + "Tip: you can use commands in private messages.```");
         }
 
