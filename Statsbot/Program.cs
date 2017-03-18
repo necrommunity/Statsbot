@@ -137,12 +137,16 @@ namespace Statsbot
 
         public void UnknownCommand(object sender, CommandErrorEventArgs e)
         {
-            string[] args = e.Message.RawText.Split(' ');
-            string t = args[0];
-            if (args.Length > 0)
-                t = args[1];
-            e.Channel.SendMessage("```Unknown command \"" + t + "\". Type \".statsbot help\" for a list of commands.\n"
-                        + "Tip: you can use commands in private messages.```");
+            if (e.Message.RawText.Contains(' '))
+            {
+                e.Channel.SendMessage("```Unknown command \"" + e.Message.RawText.Split(' ')[1] + "\". Type \".statsbot help\" for a list of commands.\n"
+                       + "Tip: you can use commands in private messages.```");
+            }
+            else
+            {
+                e.Channel.SendMessage("```You must enter a command.\n"
+                       + "Tip: you can use commands in private messages.```");
+            }
         }
 
         public void Log(object sender, LogMessageEventArgs e)
