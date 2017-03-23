@@ -144,7 +144,7 @@ namespace Statsbot
             }
             else
             {
-                e.Channel.SendMessage("```You must enter a command.\n"
+                e.Channel.SendMessage("```Please enter a command.\n"
                        + "Tip: you can use commands in private messages.```");
             }
         }
