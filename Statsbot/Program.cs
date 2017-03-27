@@ -74,6 +74,12 @@ namespace Statsbot
             }
             racebot = new Racebot();
 
+            //while (true) //debug mode essentially
+            //{
+            //    string arg = Console.ReadLine();
+            //    Console.WriteLine(CommandHandler.Search(arg));
+            //} 
+
             client.ExecuteAndWait(async () => await client.Connect(config.DiscordToken, TokenType.Bot));
 
         }

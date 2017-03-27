@@ -9,7 +9,6 @@ namespace Statsbot
 
     public static class CommandHandler
     {
-
         public static string Help(string q)
         {
             if (q.StartsWith("search") || q.StartsWith("player") || q.StartsWith("toofz"))
@@ -113,32 +112,58 @@ namespace Statsbot
             if (playerEntries.Player == null || playerEntries.Entries.Length == 0)
                 return ("Couldn't find results for \"" + name + "\".");
 
-            string product = "Amplified";
+            string product = "amplified";
+
             if (type.Contains("amplified"))
                 type = type.Replace("amplified", null);
+
             if (type.Contains("classic"))
             {
-                product = "Classic";
+                product = "classic";
                 type = type.Replace("classic", null);
                 type = type.Trim();
+            }
+
+            string mode = "standard";
+            if (type.Contains("return"))
+            {
+                type = type.Replace("no return", null);
+                type = type.Replace("noreturn", null);
+                type = type.Replace("return", null);
+                mode = "no-return";
+            }
+
+            if (type.Contains("hard"))
+            {
+                type = type.Replace("hardmode", null);
+                type = type.Replace("hard mode", null);
+                type = type.Replace("hard", null);
+                mode = "hard-mode";
+            }
+
+            string seeded = "";
+            if(type.Contains("seeded"))
+            {
+                type = type.Replace("seeded", null);
+                seeded = "seeded-";
             }
 
             StringBuilder sb = new StringBuilder();
 
             sb.Append("Player: " + playerEntries.Player.Display_name + "\n");
             sb.Append("SteamID: " + playerEntries.Player.ID + "\n\n");
-            sb.Append("Top " + type + " results\n");
+            sb.Append("Top " + seeded + type + " results " + "(" + product + ", " + mode + ")\n");
 
             foreach (PlayerEntry en in playerEntries.Entries)
             {
-                if (type.Equals(en.Leaderboard.Run, StringComparison.OrdinalIgnoreCase) && en.Leaderboard.Product == product)
+                if (en.Leaderboard.Run == seeded + type && en.Leaderboard.Product == product && en.Leaderboard.Mode == mode)
                 {
-                    sb.Append("\t" + en.Leaderboard.Character + " (" + en.Leaderboard.Product + ")");
+                    sb.Append("\t" + en.Leaderboard.Character);
                     for (int i = en.Leaderboard.Character.Length + en.Leaderboard.Product.Length; i < 17; i++)
                     {
                         sb.Append(" ");
                     }
-                    sb.Append(ScoreToString(en.Score, en.Leaderboard.Run, en.Leaderboard.Character, en.Leaderboard.Product.Equals("Amplified")));
+                    sb.Append(ScoreToString(en.Score, en.Leaderboard.Run, en.Leaderboard.Character, en.Leaderboard.Product.Equals("amplified")));
                     for (int i = Digits(en.Rank); i < 6; i++) { sb.Append(" "); }
                     sb.Append(RankToString(en.Rank) + "\n");
                 }
@@ -252,18 +277,19 @@ namespace Statsbot
                 type = type.Replace("amplified", null);
             }
 
-            if(type.Contains("return"))
+            if (type.Contains("return"))
             {
-                type = type.Replace("return", null);
                 type = type.Replace("no return", null);
+                type = type.Replace("noreturn", null);
+                type = type.Replace("return", null);
                 lb.Mode = Mode.NoReturn;
             }
 
-            if(type.Contains("hard"))
+            if (type.Contains("hard"))
             {
-                type = type.Replace("hard", null);
                 type = type.Replace("hardmode", null);
                 type = type.Replace("hard mode", null);
+                type = type.Replace("hard", null);
                 lb.Mode = Mode.Hard;
             }
 
@@ -347,6 +373,8 @@ namespace Statsbot
             {
                 case "Score":
                 case "SeededScore":
+                case "score":
+                case "seeded-score":
                     for (int i = Digits(score); i < 7; i++)
                     {
                         sb.Append(" ");
@@ -355,6 +383,8 @@ namespace Statsbot
 
                 case "Speed":
                 case "SeededSpeed":
+                case "speed":
+                case "seeded-speed":
 
                     score = 100000000 - score;
                     TimeSpan t = TimeSpan.FromMilliseconds(score);
@@ -363,6 +393,7 @@ namespace Statsbot
                     return ("  " + t.ToString(@"mm\:ss\.ff"));
 
                 case "Deathless":
+                case "deathless":
                     int d = Digits(score);
                     if (d < 3)
                         d = 3;
