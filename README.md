@@ -2,18 +2,18 @@
 Discord bot created for the CoNDOR server. Fetches and formats Crypt of the Necrodancer stats.
 
 
-##Features
+## Features
 - Search - information regarding a player's personal bests using Mendayen's api (http://api.toofz.com/help).
 - Leaderboard - supports all leaderboards as fetched from the steam api.
 - Records - various misc stats such as playtime, deaths, characters clears count, etc that are saved on steam.
 - Necrobot - returns results of Incnone's necrobot races from the community database.
 
 
-##Command syntax
+## Command syntax
 All commands in public servers must start with `.statsbot` or `.sb`.
 This prefix can be dropped in private messages.
 
-###Name search
+### Name search
 Displays a list of players with a matching name, ordered by entry count.
 
 .statsbot \<s/search/player/toofz> `<name>`
@@ -22,7 +22,7 @@ Displays a list of players with a matching name, ordered by entry count.
 
 >.statsbot search bird
 
-###Player results
+### Player results
 Displays the player's personal bests in the specified category.
 
 .statsbot \<s/search/player/toofz> `<name/steamID>` : `<product>`(optional) `<category>`
@@ -41,7 +41,7 @@ Displays the player's personal bests in the specified category.
 
 >.sb toofz bear : classic seeded score
 
-###Leaderboards
+### Leaderboards
 Displays the specified leaderboard.
 
 .statsbot \<leaderboard/lb> `<charcter>` : `<product>`(optional) `<category>` &`<offset>`(optional)
@@ -58,7 +58,7 @@ Displays the specified leaderboard.
 
 >.sb leaderboard all: classic score
 
-###Records
+### Records
 Displays various misc steam statistics.
 
 .statsbot \<records/stats>  `<name/steamID>`
@@ -69,7 +69,7 @@ Displays various misc steam statistics.
 
 >.sb stats horse
 
-###Necrobot
+### Necrobot
 Displayed a user's past necrobot races.
 
 .statsbot \<necrobot/races> `<name>`(optional) &`<offset>`(optional)
@@ -83,7 +83,7 @@ Displayed a user's past necrobot races.
 >.sb races mouse
 
 
-###Help
+### Help
 Displays the help information and a list of commands.
 
 .statsbot help `<command>`(optional)
@@ -94,7 +94,7 @@ Displays the help information and a list of commands.
 
 >.sb help search
 
-###Version
+### Version
 Displays the bot's current version.
 
 >.statsbot version
