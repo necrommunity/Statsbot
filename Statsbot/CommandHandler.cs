@@ -353,6 +353,11 @@ namespace Statsbot
 
         public static string RankToString(int rank)
         {
+            if ((rank % 100) / 10 == 1)
+            {
+                return (rank + "th");
+            }
+
             switch (rank % 10)
             {
                 case (1):
