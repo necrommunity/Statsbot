@@ -10,41 +10,41 @@ Discord bot created for the CoNDOR server. Fetches and formats Crypt of the Necr
 
 
 ## Command syntax
-All commands in public servers must start with `.statsbot` or `.sb`.
-This prefix can be dropped in private messages.
+All commands in public servers must start with a `.`
+The only exception currently is CoNDOR S5 server (to prevent conflicts with inc's bot)
 
 ### Name search
 Displays a list of players with a matching name, ordered by entry count.
 
-.statsbot \<s/search/player/toofz> `<name>`
+\<.s/.search/.player/.toofz> `<name>`
 
 `name`: The name searched.
 
->.statsbot search bird
+>.search bird
 
 ### Player results
 Displays the player's personal bests in the specified category.
 
-.statsbot \<s/search/player/toofz> `<name/steamID>` : `<product>`(optional) `<category>`
+\<.speed/.score/.deathless> `<name/steamID>` `<product>`(optional) `<mode>`(optional)
 
 `name`: Name searched. The results displayed are of the player with the most entries.
 
 `steamID`: Can be used instead of a name. An argument will be treated as an ID if it begins with '#'.
 
-`product`: By default the results are with Amplified only. Adding "classic" as a product will return classic results.
+`product`: By default the results are Amplified only. Adding "classic" as a product will return classic results.
 
-`category`: Run type to return. (score, speed, deathless, seeded score, seeded speed)
+`mode`: Run's game mode, standard by default. (standard, hardmode. noreturn)
 
->.statsbot search dog: speed
+>.speed dog
 
->.statsbot player cat : deathless
+>.score cat seeded classic
 
->.sb toofz bear : classic seeded score
+>.deathless bear noreturn
 
 ### Leaderboards
 Displays the specified leaderboard.
 
-.statsbot \<leaderboard/lb> `<charcter>` : `<product>`(optional) `<category>` &`<offset>`(optional)
+\<.leaderboard/.lb> `<charcter>` : `<product>`(optional) `<category>` &`<offset>`(optional)
 
 `charcter`: The character type of the leaderboard. (All, Aria, Bard, Bolt, Cadence, Coda, Dorian, Dove, Eli, Melody, Monk, Nocturna, Story)
 
@@ -52,49 +52,49 @@ Displays the specified leaderboard.
 
 `offset`: Changes the range of the displayed entries. The offset is 0 by default. '&' can be replaced by "offset=".
 
->.statsbot leaderboard nocturna: deathless
+>.leaderboard nocturna: deathless
 
->.statsbot lb bard: seeded speed
+>.lb bard: seeded speed
 
->.sb leaderboard all: classic score
+>.leaderboard all: classic score
 
 ### Records
 Displays various misc steam statistics.
 
-.statsbot \<records/stats>  `<name/steamID>`
+\<.records/.stats>  `<name/steamID>`
 
 `name/SteamID` is the same as search.
 
->.statsbot records penguin
+>.s records penguin
 
->.sb stats horse
+>.stats horse
 
 ### Necrobot
 Displayed a user's past necrobot races.
 
-.statsbot \<necrobot/races> `<name>`(optional) &`<offset>`(optional)
+\<.necrobot/.races> `<name>`(optional) &`<offset>`(optional)
 
 `name`: The discord user to search. By default the command will return the user's results.
 
 `offset` is the same as leaderboards display.
 
->.statsbot necrobot
+>.necrobot
 
->.sb races mouse
+>.races mouse
 
 
 ### Help
 Displays the help information and a list of commands.
 
-.statsbot help `<command>`(optional)
+.help `<command>`(optional)
 
 `command`: The command to do expand on.
 
->.statsbot help
+>.help
 
->.sb help search
+>.help search
 
 ### Version
 Displays the bot's current version.
 
->.statsbot version
+>.version

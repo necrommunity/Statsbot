@@ -15,6 +15,7 @@ namespace Statsbot
 
         public string GetResults(string user, int offset)
         {
+            user = Filter(user);
             StringBuilder sb = new StringBuilder();
             using (Connection)
             {
@@ -55,6 +56,16 @@ namespace Statsbot
             return sb.ToString();
         }
 
+        public string Filter(string q)
+        {
+            string[] filter = { "select", "update", "delete", "insert", "create", "alter", "drop" };
+            foreach(string s in filter)
+            {
+                if (q.Contains(s))
+                    q = q.Replace(s, null);
+            }
+            return q;
+        }
 
         public string DisplayResults(string user, string q)
         {
