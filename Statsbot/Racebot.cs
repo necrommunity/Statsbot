@@ -26,7 +26,7 @@ namespace Statsbot
                         + "' AND racer_data.discord_id=user_data.discord_id AND race_data.race_id=racer_data.race_id ORDER BY race_data.race_id DESC", Connection);
                     using (MySqlDataReader r = comm.ExecuteReader())
                     {
-                        for (int i = 0; i < (offset + 5) && r.Read(); i++) //while havn't reached end of reader
+                        for (int i = 0; i < (offset + 10) && r.Read(); i++) //while havn't reached end of reader
                         {
                             if (i >= offset) //starts reading at specified offset
                             {

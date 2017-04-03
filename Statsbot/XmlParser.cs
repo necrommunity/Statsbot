@@ -49,11 +49,11 @@ namespace Statsbot
                                 string s = e.InnerText;
                                 lb.DisplayName = s;
                                 if (!s.Contains("Amplified"))
-                                    lb.Category.Amplified = false;
+                                    lb.Category.Product = Product.Classic;
                                 if (s.Contains("Seeded"))
                                     lb.Category.Seeded = true;
                                 if (s.Contains("Hard"))
-                                    lb.Category.Mode = Mode.Hard;
+                                    lb.Category.Mode = Mode.Hardmode;
                                 if (s.Contains("Return"))
                                     lb.Category.Mode = Mode.NoReturn;
                                 for (int i = 0; i < 3; i++)
@@ -83,10 +83,10 @@ namespace Statsbot
             return list;
         }
 
-        public static List<Entry> ParseLeaderboard(Leaderboard lb, int offset)
+        public static List<SteamEntry> ParseLeaderboard(Leaderboard lb, int offset)
         {
             string xml = ApiSender.GetLeaderboard(lb.ID, offset);
-            List<Entry> list = new List<Entry>();
+            List<SteamEntry> list = new List<SteamEntry>();
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(xml);
 
@@ -98,7 +98,7 @@ namespace Statsbot
 
             foreach (XmlNode n in doc.DocumentElement.ChildNodes[i])
             {
-                Entry en = new Entry();
+                SteamEntry en = new SteamEntry();
 
                 foreach (XmlNode e in n)
                 {

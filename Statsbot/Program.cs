@@ -42,12 +42,14 @@ namespace Statsbot
                 x.AllowMentionPrefix = true;
                 x.CustomPrefixHandler = (m) =>
                 {
+                    if (m.Server != null && m.Server.Id == 83287148966449152 && m.Channel.Id != 296636142210646016) //main server limit to botspam
+                        return -1;
                     if (m.RawText.StartsWith(".statsbot"))
                         return 9;
                     if (m.RawText.StartsWith(".sb"))
                         return 3;
-                    if (m.Channel.IsPrivate)
-                        return 0;
+                    if (m.RawText.StartsWith(".") && (m.Channel.IsPrivate || m.Server.Id != 214389515417026561)) //prevent conflict with inc's bot
+                        return 1;
                     return -1;
                 };
                 x.ErrorHandler += UnknownCommand;
@@ -77,12 +79,14 @@ namespace Statsbot
             //while (true) //debug mode essentially
             //{
             //    string arg = Console.ReadLine();
-            //    Console.WriteLine(CommandHandler.Search(arg));
-            //} 
+            //    Console.WriteLine(CommandHandler.PlayerScores(arg, RunType.Deathless));
+            //}
 
             client.ExecuteAndWait(async () => await client.Connect(config.DiscordToken, TokenType.Bot));
 
         }
+
+
 
         public void CreateCommands()
         {
@@ -91,7 +95,7 @@ namespace Statsbot
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("```Statsbot v0.79. Type \".statsbot help\" for a list of commands.```");
+                    await e.Channel.SendMessage("```Statsbot v0.8. Type \".statsbot help\" for a list of commands.```");
                 });
             cService.CreateCommand("help")
                 .Parameter("arg", ParameterType.Unparsed)
@@ -104,7 +108,25 @@ namespace Statsbot
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("```" + CommandHandler.Search(e.GetArg(0).ToLower()) + "```");
+                    await e.Channel.SendMessage("```" + CommandHandler.SearchPlayers(e.GetArg(0).ToLower()) + "```");
+                });
+            cService.CreateCommand("speed")
+                .Parameter("arg", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendMessage("```" + CommandHandler.PlayerScores(e.GetArg(0).ToLower(), RunType.Speed) + "```");
+                });
+            cService.CreateCommand("score")
+                .Parameter("arg", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendMessage("```" + CommandHandler.PlayerScores(e.GetArg(0).ToLower(), RunType.Score) + "```");
+                });
+            cService.CreateCommand("deathless")
+                .Parameter("arg", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendMessage("```" + CommandHandler.PlayerScores(e.GetArg(0).ToLower(), RunType.Deathless) + "```");
                 });
             cService.CreateCommand("records")
                 .Alias(new string[] { "stats", "record" })
@@ -143,21 +165,20 @@ namespace Statsbot
 
         public void UnknownCommand(object sender, CommandErrorEventArgs e)
         {
-            if (e.Message.RawText.Contains(' '))
+            string args = e.Message.RawText;
+            if (args.StartsWith(".statsbot") || args.StartsWith(".sb"))
             {
-                e.Channel.SendMessage("```Unknown command \"" + e.Message.RawText.Split(' ')[1] + "\". Type \".statsbot help\" for a list of commands.\n"
-                       + "Tip: you can use commands in private messages.```");
-            }
-            else
-            {
-                e.Channel.SendMessage("```Please enter a command.\n"
-                       + "Tip: you can use commands in private messages.```");
+                if (args.Contains(' '))
+                    e.Channel.SendMessage("Unknown command \"" + args.Split(' ')[1] + "\". Type \".statsbot help\" for a list of commands.```");
+                else
+                    e.Channel.SendMessage("Please enter a command. Type \".statsbot help\" for a list of commands.```");
             }
         }
 
         public void Log(object sender, LogMessageEventArgs e)
         {
-            Console.WriteLine($"[{DateTime.Now.ToString(new CultureInfo("fr-FR"))}] [{e.Severity}] [{e.Source}] [{e.Message}]");
+            if (!(e.Message == "Unknown message type: MESSAGE_REACTION_REMOVE" || e.Message == "Unknown message type: MESSAGE_REACTION_ADD"))
+                Console.WriteLine($"[{DateTime.Now.ToString(new CultureInfo("fr-FR"))}] [{e.Severity}] [{e.Source}] [{e.Message}]");
         }
 
     }

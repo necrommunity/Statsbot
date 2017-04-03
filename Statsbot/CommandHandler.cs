@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 namespace Statsbot
 {
 
+    public enum Character { All, Aria, Bard, Bolt, Cadence, Coda, Diamond, Dorian, Dove, Eli, Melody, Monk, Nocturna, Story }
+    public enum RunType { Deathless, Score, Speed }
+    public enum Mode { Standard, Hardmode, NoReturn }
+    public enum Product { Classic, Amplified }
+
     public static class CommandHandler
     {
+
         public static string Help(string q)
         {
             if (q.StartsWith("search") || q.StartsWith("player") || q.StartsWith("toofz"))
@@ -37,32 +43,22 @@ namespace Statsbot
                 );
         }
 
-        public static string Search(string q)
+        public static string SearchPlayers(string q)
         {
             StringBuilder sb = new StringBuilder();
-            if (!q.Contains(":")) //if the search isnt specified
+            PlayerNames players = ApiSender.GetNames(q);
+
+            if (players.Players.Length == 0)
+                return ("No results found for \"" + q + "\".");
+
+            sb.Append("Displaying top players for \"" + q + "\"\n\n");
+            for (int i = 0; i < players.Players.GetLength(0) && i < 5; i++)
             {
-                PlayerNames players = ApiSender.GetNames(q);
-
-                if (players.Players.Length == 0)
-                    return ("No results found for \"" + q + "\".");
-
-                sb.Append("Displaying top players for \"" + q + "\"\n\n");
-                for (int i = 0; i < players.Players.GetLength(0) && i < 5; i++)
-                {
-                    Player player = players.Players[i];
-                    sb.Append(player.Display_name + "\n");
-                    sb.Append("\tSteam ID : " + player.ID + "\n");
-                }
-                return sb.ToString();
+                Player player = players.Players[i];
+                sb.Append(player.Display_name + "\n");
+                sb.Append("\tSteam ID : " + player.ID + "\n");
             }
-
-            string[] split = q.Split(':');
-            string name = split[0];
-            string type = split[1];
-            type = type.Replace(" ", null);
-
-            return (PlayerScores(name, type));
+            return sb.ToString();
         }
 
         public static PlayerEntries GetPlayer(string name)
@@ -90,13 +86,21 @@ namespace Statsbot
             return playerEntries;
         }
 
-        public static string PlayerScores(string name, string type)
+        public static string PlayerScores(string args, RunType type)
         {
 
             PlayerEntries playerEntries = new PlayerEntries();
 
-            bool id = name.StartsWith("#");
-            if (id)
+            if (args.Length < 1)
+                return ("Missing name to search.");
+            string name = args.Split(' ')[0];
+
+            if (name.StartsWith("\""))
+            {
+                name = args.Split('\"')[0];
+            }
+
+            if (name.StartsWith("#"))
             {
                 name = name.Replace("#", null);
                 playerEntries = ApiSender.GetPlayerScores(name);
@@ -105,69 +109,56 @@ namespace Statsbot
             else
             {
                 PlayerNames results = ApiSender.GetNames(name);
-                if (!(results.Players.GetLength(0) == 0))
+                if (results.Players.GetLength(0) == 0)
+                    return ("Couldn't find results for \"" + name + "\".");
+                else
                     playerEntries = ApiSender.GetPlayerScores(results.Players[0].ID);
             }
 
-            if (playerEntries.Player == null || playerEntries.Entries.Length == 0)
-                return ("Couldn't find results for \"" + name + "\".");
+            Category filter = new Category();
 
-            string product = "amplified";
+            if (args.Contains("classic"))
+                filter.Product = Product.Classic;
 
-            if (type.Contains("amplified"))
-                type = type.Replace("amplified", null);
-
-            if (type.Contains("classic"))
+            if (args.Contains("noreturn"))
             {
-                product = "classic";
-                type = type.Replace("classic", null);
-                type = type.Trim();
+                filter.Mode = Mode.NoReturn;
             }
 
-            string mode = "standard";
-            if (type.Contains("return"))
+            if (args.Contains("hardmode"))
             {
-                type = type.Replace("no return", null);
-                type = type.Replace("noreturn", null);
-                type = type.Replace("return", null);
-                mode = "no-return";
+                filter.Mode = Mode.Hardmode;
             }
 
-            if (type.Contains("hard"))
+            if (args.Contains("seeded"))
             {
-                type = type.Replace("hardmode", null);
-                type = type.Replace("hard mode", null);
-                type = type.Replace("hard", null);
-                mode = "hard-mode";
-            }
-
-            string seeded = "";
-            if(type.Contains("seeded"))
-            {
-                type = type.Replace("seeded", null);
-                seeded = "seeded-";
+                filter.Seeded = true;
             }
 
             StringBuilder sb = new StringBuilder();
 
             sb.Append("Player: " + playerEntries.Player.Display_name + "\n");
             sb.Append("SteamID: " + playerEntries.Player.ID + "\n\n");
-            sb.Append("Top " + seeded + type + " results " + "(" + product + ", " + mode + ")\n");
+            sb.Append("Displaying " + RunToString(type, filter.Seeded) + " results " + "(" + filter.Product + ", " + filter.Mode + ")\n");
+
 
             foreach (PlayerEntry en in playerEntries.Entries)
             {
-                if (en.Leaderboard.Run == seeded + type && en.Leaderboard.Product == product && en.Leaderboard.Mode == mode)
+                Category cat = en.Leaderboard.ToCategory();
+                if (cat.Type == type && cat.Seeded == filter.Seeded && cat.Product == filter.Product && cat.Mode == filter.Mode)
                 {
-                    sb.Append("\t" + en.Leaderboard.Character);
-                    for (int i = en.Leaderboard.Character.Length + en.Leaderboard.Product.Length; i < 17; i++)
+                    sb.Append("\t" + cat.Char);
+                    for (int i = cat.Char.ToString().Length + cat.Product.ToString().Length; i < 17; i++)
                     {
                         sb.Append(" ");
                     }
-                    sb.Append(ScoreToString(en.Score, en.Leaderboard.Run, en.Leaderboard.Character, en.Leaderboard.Product.Equals("amplified")));
+                    sb.Append(ScoreToString(en.Score, cat.Type, cat.Char, cat.Product));
                     for (int i = Digits(en.Rank); i < 6; i++) { sb.Append(" "); }
                     sb.Append(RankToString(en.Rank) + "\n");
                 }
             }
+            if (sb.Length < 110)
+                return ("No entries found. Is this a valid category?");
             return sb.ToString();
         }
 
@@ -188,41 +179,29 @@ namespace Statsbot
             sb.Append("SteamID: " + player.ID + "\n");
             sb.Append("Total playtime: " + time.Playtime_forever / 60 + " hours (" + time.Playtime_2weeks / 60 + " recently)\n\n");
 
-            sb.Append("Deaths: " + stats["deaths"] + " (" + (stats["deaths"] / (float)(time.Playtime_forever / 60)) + " per hour)\n");
-            sb.Append("Green bats killed: " + stats["bats"] + "\n");
-            sb.Append("Zone clears: " + stats["z1"] + " | " + stats["z2"] + " | " + stats["z3"] + " | " + stats["z4"] + "\n");
+            sb.Append("Deaths: " + stats["Deaths"] + " (" + (stats["Deaths"] / (float)(time.Playtime_forever / 60)) + " per hour)\n");
+            sb.Append("Green bats killed: " + stats["Bats"] + "\n\n");
             sb.Append("Character clears ");
-            bool nl = true;
             foreach (string s in (Enum.GetNames(typeof(Character))))
             {
                 if (stats[s] != 0)
                 {
-                    if (nl)
-                        sb.Append("\n   " + s);
-                    else
-                        sb.Append("\t" + s);
-                    for (int i = s.Length + Digits(stats[s]); i < 14; i++)
+                    sb.Append("\n   " + s);
+                    for (int i = s.Length + Digits(stats[s]); i < 12; i++)
                     { sb.Append(" "); }
                     sb.Append(stats[s]);
                     switch (s)
                     {
                         case "Cadence":
-                            sb.Append(" -  " + stats["speedruns"] + " sub-15, " + stats["dailies"] + " dailies");
-                            nl = false;
+                            sb.Append(" (" + stats["Speedruns"] + " sub-15, " + stats["Dailies"] + " dailies)");
                             break;
                         case "Aria":
-                            sb.Append(" -  " + stats["ariaLow"] + " low%");
-                            nl = false;
+                            sb.Append(" (" + stats["AriaLow"] + " low%)");
                             break;
                         case "All":
-                            sb.Append(" -  " + stats["lowest"] + " low%");
-                            nl = false;
+                            sb.Append(" (" + stats["Lowest"] + " low%)");
                             break;
                     }
-                    if (nl == true)
-                        nl = false;
-                    else
-                        nl = true;
                 }
             }
             return sb.ToString();
@@ -231,18 +210,15 @@ namespace Statsbot
         public static string Leaderboard(string q)
         {
 
-            if (!q.Contains(":"))
-                q = q + ":speed";
-
             Category lb = new Category();
 
             string character = q.Split(new[] { ':' })[0];
             character = character.Replace(" ", null);
-            for (int i = 0; i < 14; i++)
+            for (int i = 0; i < 15; i++)
             {
-                if (i == 14)
+                if (i == 15)
                     return ("Please enter a valid character.");
-                if (character.Contains(Enum.GetNames(typeof(Character))[i].ToLower()))
+                if (character.Equals(Enum.GetNames(typeof(Character))[i], StringComparison.InvariantCultureIgnoreCase))
                 {
                     lb.Char = (Character)i;
                     break;
@@ -268,29 +244,20 @@ namespace Statsbot
 
             if (type.Contains("classic"))
             {
-                lb.Amplified = false;
+                lb.Product = Product.Classic;
                 type = type.Replace("classic", null);
             }
 
-            if (type.Contains("amplified"))
+            if (type.Contains("noreturn"))
             {
-                type = type.Replace("amplified", null);
-            }
-
-            if (type.Contains("return"))
-            {
-                type = type.Replace("no return", null);
                 type = type.Replace("noreturn", null);
-                type = type.Replace("return", null);
                 lb.Mode = Mode.NoReturn;
             }
 
-            if (type.Contains("hard"))
+            if (type.Contains("hardmode"))
             {
                 type = type.Replace("hardmode", null);
-                type = type.Replace("hard mode", null);
-                type = type.Replace("hard", null);
-                lb.Mode = Mode.Hard;
+                lb.Mode = Mode.Hardmode;
             }
 
             if (type.Contains("seeded"))
@@ -322,7 +289,7 @@ namespace Statsbot
             try { lb = XmlParser.lbInfo[category]; }
             catch { return ("Please enter a valid leaderboard."); }
 
-            List<Entry> entries = XmlParser.ParseLeaderboard(lb, offset);
+            List<SteamEntry> entries = XmlParser.ParseLeaderboard(lb, offset);
             ApiSender.GetSteamNames(entries);
 
             if (entries.Count == 0)
@@ -332,13 +299,13 @@ namespace Statsbot
             int digitR = Digits(offset + 10);
 
             sb.Append("Displaying results for " + lb.DisplayName + "\n\n");
-            foreach (Entry en in entries)
+            foreach (SteamEntry en in entries)
             {
                 if (Digits(en.Rank) < digitR)
                     sb.Append("0");
 
                 sb.Append(en.Rank + ".   "
-                    + ScoreToString(en.Score, lb.Category.GetRunString(), lb.Category.Char.ToString(), lb.Category.Amplified)
+                    + ScoreToString(en.Score, lb.Category.Type, lb.Category.Char, lb.Category.Product)
                     + "\t" + en.Personaname + "\n");
             }
             return sb.ToString();
@@ -371,25 +338,27 @@ namespace Statsbot
             }
         }
 
-        public static string ScoreToString(int score, string type, string character, bool amplified)
+        public static string RunToString(RunType type, bool seeded)
+        {
+            if (seeded)
+                return ("Seeded-" + type);
+            else
+                return (type.ToString());
+        }
+
+        public static string ScoreToString(int score, RunType type, Character character, Product product)
         {
             StringBuilder sb = new StringBuilder();
             switch (type)
             {
-                case "Score":
-                case "SeededScore":
-                case "score":
-                case "seeded-score":
+                case RunType.Score:
                     for (int i = Digits(score); i < 7; i++)
                     {
                         sb.Append(" ");
                     }
                     return (sb.ToString() + score.ToString());
 
-                case "Speed":
-                case "SeededSpeed":
-                case "speed":
-                case "seeded-speed":
+                case RunType.Speed:
 
                     score = 100000000 - score;
                     TimeSpan t = TimeSpan.FromMilliseconds(score);
@@ -397,8 +366,7 @@ namespace Statsbot
                         return (t.ToString(@"h\:mm\:ss\.ff"));
                     return ("  " + t.ToString(@"mm\:ss\.ff"));
 
-                case "Deathless":
-                case "deathless":
+                case RunType.Deathless:
                     int d = Digits(score);
                     if (d < 3)
                         d = 3;
@@ -410,7 +378,7 @@ namespace Statsbot
                     score = score % 100;
                     if (!character.Equals("Aria"))
                         return (sb.ToString() + wins + " (" + (score / 10 + 1) + "-" + (score % 10 + 1) + ")");
-                    if (amplified)
+                    if (product == Product.Amplified)
                         return (sb.ToString() + wins + " (" + (5 - (score / 10)) + "-" + (score % 10 + 1) + ")");
                     else
                         return (sb.ToString() + wins + " (" + (4 - (score / 10)) + "-" + (score % 10 + 1) + ")");

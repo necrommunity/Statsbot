@@ -85,14 +85,14 @@ namespace Statsbot
             return response;
         }
 
-        public static void GetSteamNames(List<Entry> ids) // https://developer.valvesoftware.com/wiki/Steam_Web_API#GetPlayerSummaries_.28v0002.29
+        public static void GetSteamNames(List<SteamEntry> ids) // https://developer.valvesoftware.com/wiki/Steam_Web_API#GetPlayerSummaries_.28v0002.29
         {
             //searches for the profile names of given ids
             ids = ids.OrderBy(Entry => Entry.Steamid).ToList();
             SteamUser[] steamUsers;
 
             StringBuilder request = new StringBuilder();
-            foreach (Entry e in ids) { request.Append(e.Steamid + ","); }
+            foreach (SteamEntry e in ids) { request.Append(e.Steamid + ","); }
             steamUsers = ServerGet<SteamUsersResponse>("ISteamUser/GetPlayerSummaries/v0002/?steamids=" + request.ToString(), "steam").Response.Players;
             steamUsers = steamUsers.OrderBy(SteamUser => SteamUser.Steamid).ToArray();
             for (int i = 0; i < ids.Count; i++)

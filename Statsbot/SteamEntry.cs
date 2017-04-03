@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Statsbot
 {
-    public class Entry
+    public class SteamEntry
     {
         public string Steamid { get; set; }
         public string Personaname { get; set; }
