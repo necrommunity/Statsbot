@@ -44,13 +44,13 @@ Displays the player's personal bests in the specified category.
 ### Leaderboards
 Displays the specified leaderboard.
 
-\<.leaderboard/.lb> `<charcter>` : `<product>`(optional) `<category>` &`<offset>`(optional)
+\<.leaderboard/.lb> `<charcter>` `<product>`(optional) `<category>`(optional) &`<offset>`(optional)
 
-`charcter`: The character type of the leaderboard. (All, Aria, Bard, Bolt, Cadence, Coda, Dorian, Dove, Eli, Melody, Monk, Nocturna, Story)
+`charcter`: The character type of the leaderboard. (All, Aria, Bard, Bolt, Cadence, Coda, Diamond, Dorian, Dove, Eli, Melody, Monk, Nocturna, Story)
 
 `product`, `category` are the same as search.
 
-`offset`: Changes the range of the displayed entries. The offset is 0 by default. '&' can be replaced by "offset=".
+`offset`: Changes the range of the displayed entries. The offset is 0 by default.
 
 >.leaderboard nocturna: deathless
 

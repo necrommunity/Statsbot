@@ -95,7 +95,7 @@ namespace Statsbot
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("```Statsbot v0.8. Type \".statsbot help\" for a list of commands.```");
+                    await e.Channel.SendMessage("```Statsbot v0.81. Type \".statsbot help\" for a list of commands.```");
                 });
             cService.CreateCommand("help")
                 .Parameter("arg", ParameterType.Unparsed)
@@ -104,7 +104,7 @@ namespace Statsbot
                     await e.Channel.SendMessage("```" + CommandHandler.Help(e.GetArg(0).ToLower()) + "```");
                 });
             cService.CreateCommand("search")
-                .Alias(new string[] { "player", "toofz", "s" })
+                .Alias(new string[] { "s" })
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
@@ -169,9 +169,9 @@ namespace Statsbot
             if (args.StartsWith(".statsbot") || args.StartsWith(".sb"))
             {
                 if (args.Contains(' '))
-                    e.Channel.SendMessage("Unknown command \"" + args.Split(' ')[1] + "\". Type \".statsbot help\" for a list of commands.```");
+                    e.Channel.SendMessage("```Unknown command \"" + args.Split(' ')[1] + "\". Type \".statsbot help\" for a list of commands.```");
                 else
-                    e.Channel.SendMessage("Please enter a command. Type \".statsbot help\" for a list of commands.```");
+                    e.Channel.SendMessage("```Please enter a command. Type \".statsbot help\" for a list of commands.```");
             }
         }
 

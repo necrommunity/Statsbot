@@ -17,27 +17,32 @@ namespace Statsbot
 
         public static string Help(string q)
         {
-            if (q.StartsWith("search") || q.StartsWith("player") || q.StartsWith("toofz"))
-                return ("Searches for players and their top scores."
-                    + "\nType \".statsbot search <name>\" to see a list of search results, or \".statsbot search <name>: <category>\" to see results for a specific category."
-                    + "\nSteamID can be used instead of a name (\".statsbot search #245356: seeded score\").");
+            if (q.StartsWith("search"))
+                return ("Searches for players and their steam IDs."
+                    + "\nUse \".search <name>\" to see a list of search results."
+                    + "\nUse \".speed, .score, or .deathless <name>\" to see the player's results in a specific category.");
+            if (q.StartsWith("speed") || q.StartsWith("score") || q.StartsWith("deathless"))
+                return ("Displays specific player's personal bests in a specific category."
+                    + "\nUse \".speed, .score, or .deathless <name>\" to see the player's results in that category."
+                    + "\nAdd \"seeded\" to see the seeded leaderboards, \"classic\" to see results without the dlc, and \"hardmode\" or \"noreturn\" for the extra play modes."
+                    + "\nSteamID can be used instead of a name (\".speed #76561198000263514\").");
             if (q.StartsWith("leaderboard") || q.StartsWith("lb"))
                 return ("Displays a leaderboard."
-                    + "\nType \".statsbot leaderboard <character>: <category>\" to see a leaderboard."
-                    + "\nAdd \"classic\" before the category to see results without the dlc."
-                    + "\nAdd \"&<offset>\" after the category to see the result starting at the specified offset.");
+                    + "\nUse \".leaderboard <character> <category>\" to see a leaderboard. Speed is the default in case no category is entered."
+                    + "\nAdd \"seeded\" to see the seeded leaderboards, \"classic\" to see results without the dlc, and \"hardmode\" or \"noreturn\" for the extra play modes."
+                    + "\nAdd \"&<offset>\" in the end to see the result starting at the specified offset.");
             if (q.StartsWith("record") || q.StartsWith("stats"))
                 return ("Displays a steam user's stats."
-                    + "\nType \".stats <profile name> to display said user's stats.");
+                    + "\nType \".records <profile name> to display said user's recorded stats.");
             if (q.StartsWith("necrobot") || q.StartsWith("races"))
                 return ("Displays a user's recorded necrobot races."
-                    + "\nType \".statsbot necrobot <user>\" to see past races."
-                    + "\nAdd \"&<offset>\" to see older results.");
+                    + "\nType \".necrobot <user>\" to see past races."
+                    + "\nAdd \"&<offset>\" in the end to see older results.");
             if (q.StartsWith("version"))
                 return ("Displays the bot's current version.");
             return ("Statsbot is a bot which retrieves Crypt of the Necrodancer player stats."
-                + "\n\nAvailable commands: \"search/player/toofz\", \"leaderboard/lb\", \"records/stats\", \"necrobot/races\", \"version\"."
-                + "\nUse \".statsbot help <command>\" to expand on a command."
+                + "\n\nAvailable commands: search(s), speed, score, deathless, leaderboard(lb), records(stats), necrobot(races), version."
+                + "\nUse \".help <command>\" for more information."
                 + "\n\nFull documentation is available at https://github.com/necrommunity/Statsbot"
                 + "\nContact Naymin#5067 for feedback and bug reports."
                 );
@@ -212,72 +217,56 @@ namespace Statsbot
 
             Category lb = new Category();
 
-            string character = q.Split(new[] { ':' })[0];
-            character = character.Replace(" ", null);
             for (int i = 0; i < 15; i++)
             {
-                if (i == 15)
+                if (i == 14)
                     return ("Please enter a valid character.");
-                if (character.Equals(Enum.GetNames(typeof(Character))[i], StringComparison.InvariantCultureIgnoreCase))
+                if (InvariantContains(q, Enum.GetNames(typeof(Character))[i]))
                 {
                     lb.Char = (Character)i;
+                    q.Replace(lb.Char.ToString(), null);
                     break;
                 }
             }
 
-            string type = q.Split(new[] { ':' })[1];
+            for (int i = 0; i < 3; i++)
+            {
+                if (InvariantContains(q, Enum.GetNames(typeof(RunType))[i]))
+                {
+                    lb.Type = (RunType)i;
+                    q.Replace(lb.Type.ToString(), null);
+                    break;
+                }
+            }
 
             int offset = 1;
-            if (type.Contains("offset"))
-            {
-                type = type.Replace("offset", "&");
-                type = type.Replace("=", null);
-            }
 
-            if (type.Contains("&"))
+            if (q.Contains("&"))
             {
-                bool pos = int.TryParse(type.Split(new[] { '&' })[1], out offset);
+                bool pos = int.TryParse(q.Split(new[] { '&' })[1], out offset);
                 if (!pos)
                     return ("Please enter a valid offset.");
-                type = type.Split(new[] { '&' })[0];
+                q = q.Split(new[] { '&' })[0];
             }
 
-            if (type.Contains("classic"))
+            if (q.Contains("classic"))
             {
                 lb.Product = Product.Classic;
-                type = type.Replace("classic", null);
             }
 
-            if (type.Contains("noreturn"))
+            if (q.Contains("return"))
             {
-                type = type.Replace("noreturn", null);
                 lb.Mode = Mode.NoReturn;
             }
 
-            if (type.Contains("hardmode"))
+            if (q.Contains("hard"))
             {
-                type = type.Replace("hardmode", null);
                 lb.Mode = Mode.Hardmode;
             }
 
-            if (type.Contains("seeded"))
+            if (q.Contains("seeded"))
             {
                 lb.Seeded = true;
-                type = type.Replace("seeded", null);
-            }
-
-
-            type = type.Trim();
-
-            for (int i = 0; i < 4; i++)
-            {
-                if (i == 3)
-                    return ("Please enter a valid category.");
-                if (type.Contains(Enum.GetNames(typeof(RunType))[i].ToLower()))
-                {
-                    lb.Type = (RunType)i;
-                    break;
-                }
             }
             return LeaderboardString(lb, offset);
         }
@@ -370,7 +359,7 @@ namespace Statsbot
                     int d = Digits(score);
                     if (d < 3)
                         d = 3;
-                    for (; d < 5; d++)
+                    for (; d < 7; d++)
                     {
                         sb.Append(" ");
                     }
@@ -386,8 +375,11 @@ namespace Statsbot
                     return "error";
             }
 
+        }
 
-
+        public static bool InvariantContains(string source, string check)
+        {
+            return (source.IndexOf(check, StringComparison.InvariantCultureIgnoreCase)) >= 0;
         }
 
     }

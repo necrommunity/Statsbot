@@ -11,7 +11,7 @@ namespace Statsbot
     {
         public bool Seeded { get; set; } = false;
         public Character Char { get; set; }
-        public RunType Type { get; set; } = RunType.Score;
+        public RunType Type { get; set; } = RunType.Speed;
         public Mode Mode { get; set; } = Mode.Standard;
         public Product Product { get; set; } = Product.Amplified;
 
