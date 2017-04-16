@@ -23,7 +23,7 @@ namespace Statsbot
                 try
                 {
                     Connection.Open();
-                    MySqlCommand comm = new MySqlCommand("CALL getresults(" + user + ", 10)", Connection);
+                    MySqlCommand comm = new MySqlCommand("CALL getresults('" + user + "', 10)", Connection);
                     using (MySqlDataReader r = comm.ExecuteReader())
                     {
                         for (int i = 0; i < (offset + 10) && r.Read(); i++) //while havn't reached end of reader
