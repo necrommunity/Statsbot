@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Statsbot
 {
@@ -31,7 +32,8 @@ namespace Statsbot
                         {
                             if (i >= offset) //starts reading at specified offset
                             {
-                                sb.Append(r[0] + "  ");
+                                var date = (DateTime)r[0];
+                                sb.Append(date.ToString(new CultureInfo("fr-FR")) + "  ");
                                 sb.Append(r[1] + "  ");
                                 sb.Append(r[2] + "   ");
                                 //for (int j = r[3].ToString().Length; j <= 8; j++) { sb.Append(" "); } // displays seed
@@ -59,7 +61,7 @@ namespace Statsbot
         public string Filter(string q)
         {
             string[] filter = { "select", "update", "delete", "insert", "create", "alter", "drop" };
-            foreach(string s in filter)
+            foreach (string s in filter)
             {
                 if (q.Contains(s))
                     q = q.Replace(s, null);
@@ -67,15 +69,10 @@ namespace Statsbot
             return q;
         }
 
-        public string DisplayResults(string user, string q)
+        public string DisplayResults(string q, Discord.User user)
         {
 
             int offset = 0;
-            if (q.Contains("offset"))
-            {
-                q = q.Replace("offset", "&");
-                q = q.Replace("=", null);
-            }
 
             if (q.Contains("&"))
             {
@@ -85,16 +82,15 @@ namespace Statsbot
                 q = q.Split('&')[0];
             }
 
-            q = q.Trim();
-            if (q != "")
-                user = q;
+            if (q == "")
+                q = user.Name;
 
-            string results = GetResults(user, offset);
+            string results = GetResults(q, offset);
             if (results == "")
-                return ("No necrobot results found for \"" + user + "\".");
+                return ("No necrobot results found for \"" + q + "\".");
 
             StringBuilder sb = new StringBuilder();
-            sb.Append("Displaying requested necrobot results for " + user + " \n\n");
+            sb.Append("Displaying requested necrobot results for " + q + " \n\n");
             sb.Append(results);
             return (sb.ToString());
         }

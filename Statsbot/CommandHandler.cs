@@ -96,9 +96,10 @@ namespace Statsbot
 
             PlayerEntries playerEntries = new PlayerEntries();
 
-            if (args.Length < 1)
-                return ("Missing name to search.");
-            string name = args.Split(' ')[0];
+            string name = args;
+
+            if (args.Contains(' '))
+                name = args.Split(' ')[0];
 
             if (name.StartsWith("\""))
             {

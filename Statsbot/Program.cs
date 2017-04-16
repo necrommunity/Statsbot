@@ -108,32 +108,32 @@ namespace Statsbot
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("```" + CommandHandler.SearchPlayers(e.GetArg(0).ToLower()) + "```");
+                    await e.Channel.SendMessage("```" + CommandHandler.SearchPlayers(ParseArgs(e.GetArg(0), e.User)) + "```");
                 });
             cService.CreateCommand("speed")
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("```" + CommandHandler.PlayerScores(e.GetArg(0).ToLower(), RunType.Speed) + "```");
+                    await e.Channel.SendMessage("```" + CommandHandler.PlayerScores(ParseArgs(e.GetArg(0), e.User), RunType.Speed) + "```");
                 });
             cService.CreateCommand("score")
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("```" + CommandHandler.PlayerScores(e.GetArg(0).ToLower(), RunType.Score) + "```");
+                    await e.Channel.SendMessage("```" + CommandHandler.PlayerScores(ParseArgs(e.GetArg(0), e.User), RunType.Score) + "```");
                 });
             cService.CreateCommand("deathless")
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("```" + CommandHandler.PlayerScores(e.GetArg(0).ToLower(), RunType.Deathless) + "```");
+                    await e.Channel.SendMessage("```" + CommandHandler.PlayerScores(ParseArgs(e.GetArg(0), e.User), RunType.Deathless) + "```");
                 });
             cService.CreateCommand("records")
                 .Alias(new string[] { "stats", "record" })
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("```" + CommandHandler.Records(e.GetArg(0).ToLower()) + "```");
+                    await e.Channel.SendMessage("```" + CommandHandler.Records(ParseArgs(e.GetArg(0), e.User)) + "```");
                 });
             cService.CreateCommand("leaderboard")
                 .Alias(new string[] { "lb" })
@@ -147,7 +147,7 @@ namespace Statsbot
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("```" + racebot.DisplayResults(e.User.Name, e.GetArg(0).ToLower()) + "```");
+                    await e.Channel.SendMessage("```" + racebot.DisplayResults(e.GetArg(0), e.User) + "```");
                 });
             cService.CreateCommand("penguin")
                 .Parameter("arg", ParameterType.Unparsed)
@@ -161,6 +161,14 @@ namespace Statsbot
             //    {
             //        await client.CurrentUser.Edit(username: "Statsbot");
             //    });
+        }
+
+        public static string ParseArgs(string args, User user)
+        {
+            if (args.Length == 0)
+                return (user.Name);
+            else
+                return (args.ToLower());
         }
 
         public void UnknownCommand(object sender, CommandErrorEventArgs e)
