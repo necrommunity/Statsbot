@@ -23,9 +23,7 @@ namespace Statsbot
                 try
                 {
                     Connection.Open();
-                    MySqlCommand comm = new MySqlCommand("SELECT timestamp, character_name, descriptor, seed, time, rank, comment, level"
-                        + " FROM racer_data, race_data, user_data WHERE user_data.name='" + user
-                        + "' AND racer_data.discord_id=user_data.discord_id AND race_data.race_id=racer_data.race_id ORDER BY race_data.race_id DESC", Connection);
+                    MySqlCommand comm = new MySqlCommand("CALL getresults('" + user + "', 10)", Connection);
                     using (MySqlDataReader r = comm.ExecuteReader())
                     {
                         for (int i = 0; i < (offset + 10) && r.Read(); i++) //while havn't reached end of reader
