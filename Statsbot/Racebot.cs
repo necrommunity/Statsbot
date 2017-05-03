@@ -30,7 +30,7 @@ namespace Statsbot
                         {
                             if (i >= offset) //starts reading at specified offset
                             {
-                                sb.Append(r.GetDateTime(0).ToString("dd MMM yyyy, HH:mm") + " ");
+                                sb.Append(r.GetDateTime(0).ToString("yyyy-MM-dd HH:mm") + " ");
                                 sb.Append(r[1] + " ");
                                 sb.Append(r[2] + " ");
                                 if (r.GetBoolean(3))

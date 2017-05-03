@@ -16,7 +16,7 @@ The only exception currently is CoNDOR S5 server (to prevent conflicts with inc'
 ### Name search
 Displays a list of players with a matching name, ordered by entry count.
 
-\<.s/.search/.player/.toofz> `<name>`
+\<.s/.search> `<name>`
 
 `name`: The name searched.
 
@@ -52,11 +52,11 @@ Displays the specified leaderboard.
 
 `offset`: Changes the range of the displayed entries. The offset is 0 by default.
 
->.leaderboard nocturna: deathless
+>.leaderboard nocturna deathless
 
->.lb bard: seeded speed
+>.lb bard seeded speed
 
->.leaderboard all: classic score
+>.leaderboard all classic score &15
 
 ### Records
 Displays various misc steam statistics.
@@ -80,7 +80,7 @@ Displayed a user's past necrobot races.
 
 >.necrobot
 
->.races mouse
+>.races mouse &20
 
 
 ### Help

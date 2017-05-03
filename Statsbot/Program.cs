@@ -143,7 +143,7 @@ namespace Statsbot
                     await e.Channel.SendMessage("```" + CommandHandler.Leaderboard(e.GetArg(0).ToLower()) + "```");
                 });
             cService.CreateCommand("necrobot")
-                .Alias(new string[] { "races" })
+                .Alias(new string[] { "race", "races" })
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {

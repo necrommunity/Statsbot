@@ -17,24 +17,24 @@ namespace Statsbot
 
         public static string Help(string q)
         {
-            if (q.StartsWith("search"))
+            if (MultiContains(q, new[] { "search", "s" }))
                 return ("Searches for players and their steam IDs."
                     + "\nUse \".search <name>\" to see a list of search results."
                     + "\nUse \".speed, .score, or .deathless <name>\" to see the player's results in a specific category.");
-            if (q.StartsWith("speed") || q.StartsWith("score") || q.StartsWith("deathless"))
+            if (MultiContains(q, new[] { "speed", "score", "deathless" }))
                 return ("Displays specific player's personal bests in a specific category."
                     + "\nUse \".speed, .score, or .deathless <name>\" to see the player's results in that category."
                     + "\nAdd \"seeded\" to see the seeded leaderboards, \"classic\" to see results without the dlc, and \"hardmode\" or \"noreturn\" for the extra play modes."
                     + "\nSteamID can be used instead of a name (\".speed #76561198000263514\").");
-            if (q.StartsWith("leaderboard") || q.StartsWith("lb"))
+            if (MultiContains(q, new[] { "leaderboard", "lb" }))
                 return ("Displays a leaderboard."
                     + "\nUse \".leaderboard <character> <category>\" to see a leaderboard. Speed is the default in case no category is entered."
                     + "\nAdd \"seeded\" to see the seeded leaderboards, \"classic\" to see results without the dlc, and \"hardmode\" or \"noreturn\" for the extra play modes."
                     + "\nAdd \"&<offset>\" in the end to see the result starting at the specified offset.");
-            if (q.StartsWith("record") || q.StartsWith("stats"))
+            if (MultiContains(q, new[] { "records", "stats" }))
                 return ("Displays a steam user's stats."
                     + "\nType \".records <profile name> to display said user's recorded stats.");
-            if (q.StartsWith("necrobot") || q.StartsWith("races"))
+            if (MultiContains(q, new[] { "necrobot", "race" }))
                 return ("Displays a user's recorded necrobot races."
                     + "\nType \".necrobot <user>\" to see past races."
                     + "\nAdd \"&<offset>\" in the end to see older results.");
@@ -102,9 +102,8 @@ namespace Statsbot
                 name = args.Split(' ')[0];
 
             if (name.StartsWith("\""))
-            {
                 name = args.Split('\"')[0];
-            }
+
 
             if (name.StartsWith("#"))
             {
@@ -123,23 +122,17 @@ namespace Statsbot
 
             Category filter = new Category();
 
-            if (args.Contains("classic"))
+            if (MultiContains(args, new[] { "classic", "base" }))
                 filter.Product = Product.Classic;
 
-            if (args.Contains("noreturn"))
-            {
+            if (MultiContains(args, new[] { "return", "nr" }))
                 filter.Mode = Mode.NoReturn;
-            }
 
-            if (args.Contains("hardmode"))
-            {
+            if (args.Contains("hard"))
                 filter.Mode = Mode.Hardmode;
-            }
 
             if (args.Contains("seeded"))
-            {
                 filter.Seeded = true;
-            }
 
             StringBuilder sb = new StringBuilder();
 
@@ -250,25 +243,18 @@ namespace Statsbot
                 q = q.Split(new[] { '&' })[0];
             }
 
-            if (q.Contains("classic"))
-            {
+            if (MultiContains(q, new[] { "classic", "base" }))
                 lb.Product = Product.Classic;
-            }
 
-            if (q.Contains("return"))
-            {
+            if (MultiContains(q, new[] { "return", "nr" }))
                 lb.Mode = Mode.NoReturn;
-            }
 
             if (q.Contains("hard"))
-            {
                 lb.Mode = Mode.Hardmode;
-            }
 
             if (q.Contains("seeded"))
-            {
                 lb.Seeded = true;
-            }
+
             return LeaderboardString(lb, offset);
         }
 
@@ -381,6 +367,14 @@ namespace Statsbot
         public static bool InvariantContains(string source, string check)
         {
             return (source.IndexOf(check, StringComparison.InvariantCultureIgnoreCase)) >= 0;
+        }
+
+        public static bool MultiContains(string source, string[] check)
+        {
+            foreach (string s in check)
+                if (InvariantContains(source, s))
+                    return true;
+            return false;
         }
 
     }
