@@ -49,6 +49,8 @@ namespace Statsbot
                                     sb.Append("Forfeit! (rta " + TimeToString(r.GetInt32(5)));
                                     if (level == 0)
                                         sb.Append(")");
+                                    else if (level == 20)
+                                        sb.Append(", 5-5)");
                                     else
                                         sb.Append(", " + (level / 4 + 1) + "-" + (level % 4 + 1) + ")");
                                 }
