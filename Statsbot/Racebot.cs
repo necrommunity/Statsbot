@@ -23,26 +23,38 @@ namespace Statsbot
                 try
                 {
                     Connection.Open();
-                    MySqlCommand comm = new MySqlCommand("CALL getresults('" + user + "', 10)", Connection);
+                    MySqlCommand comm = new MySqlCommand("SELECT `timestamp`, `character`, descriptor, seeded, level, time, igt, rank, comment FROM users, races, race_runs, race_types WHERE users.discord_name='" + Filter(user) + "' AND users.user_id=race_runs.user_id AND races.type_id=race_types.type_id AND races.race_id=race_runs.race_id ORDER BY races.race_id DESC", Connection);
                     using (MySqlDataReader r = comm.ExecuteReader())
                     {
                         for (int i = 0; i < (offset + 10) && r.Read(); i++) //while havn't reached end of reader
                         {
                             if (i >= offset) //starts reading at specified offset
                             {
-                                var date = (DateTime)r[0];
-                                sb.Append(date.ToString(new CultureInfo("fr-FR")) + "  ");
-                                sb.Append(r[1] + "  ");
-                                sb.Append(r[2] + "   ");
-                                //for (int j = r[3].ToString().Length; j <= 8; j++) { sb.Append(" "); } // displays seed
-                                //sb.Append(r[3]);
-                                sb.Append(TimeToString(r[4].ToString()) + "  ");
-                                sb.Append(CommandHandler.RankToString(Convert.ToInt16(r[5])));
-                                if (r[7].ToString() != "-2")
-                                    sb.Append(" (f) ");
+                                sb.Append(r.GetDateTime(0).ToString("dd MMM yyyy, HH:mm") + " ");
+                                sb.Append(r[1] + " ");
+                                sb.Append(r[2] + " ");
+                                if (r.GetBoolean(3))
+                                    sb.Append("Seeded --- ");
                                 else
-                                    sb.Append("     ");
-                                sb.Append(r[6] + "\n");
+                                    sb.Append("Unseeded --- ");
+                                int level = r.GetInt16(4);
+                                if (level == -2)
+                                {
+                                    sb.Append(CommandHandler.RankToString(r.GetInt16(7)) + ", " + TimeToString(r.GetInt32(5)));
+                                    if (r.GetInt32(6) != -1)
+                                        sb.Append(" (igt " + TimeToString(r.GetInt32(6)) + ")");
+                                }
+                                else
+                                {
+                                    sb.Append("Forfeit! (rta " + TimeToString(r.GetInt32(5)));
+                                    if (level == 0)
+                                        sb.Append(")");
+                                    else
+                                        sb.Append(", " + (level / 4 + 1) + "-" + (level % 4 + 1) + ")");
+                                }
+                                if ((r.GetString(8)) != "")
+                                    sb.Append(": " + r[8]);
+                                sb.Append("\n");
                             }
                         }
                     }
@@ -93,11 +105,11 @@ namespace Statsbot
             return (sb.ToString());
         }
 
-        public static string TimeToString(string time)
+
+        public static string TimeToString(int time)
         {
-            TimeSpan t = TimeSpan.FromSeconds(int.Parse(time) / 100);
+            TimeSpan t = TimeSpan.FromSeconds(time / 100);
             return (t.ToString(@"mm\:ss"));
         }
-
     }
 }

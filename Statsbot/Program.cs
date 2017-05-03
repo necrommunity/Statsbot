@@ -79,7 +79,7 @@ namespace Statsbot
             //while (true) //debug mode essentially
             //{
             //    string arg = Console.ReadLine();
-            //    Console.WriteLine(CommandHandler.PlayerScores(arg, RunType.Deathless));
+            //    Console.WriteLine(racebot.DisplayResults(arg));
             //}
 
             client.ExecuteAndWait(async () => await client.Connect(config.DiscordToken, TokenType.Bot));
