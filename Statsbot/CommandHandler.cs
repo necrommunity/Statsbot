@@ -102,7 +102,7 @@ namespace Statsbot
                 name = args.Split(' ')[0];
 
             if (name.StartsWith("\""))
-                name = args.Split('\"')[0];
+                name = args.Split('\"')[1];
 
 
             if (name.StartsWith("#"))
