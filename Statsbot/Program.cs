@@ -79,7 +79,7 @@ namespace Statsbot
             //while (true) //debug mode essentially
             //{
             //    string arg = Console.ReadLine();
-            //    Console.WriteLine(racebot.DisplayResults(arg));
+            //    Console.WriteLine(Countdown());
             //}
 
             client.ExecuteAndWait(async () => await client.Connect(config.DiscordToken, TokenType.Bot));
@@ -155,6 +155,18 @@ namespace Statsbot
                 {
                     await e.Channel.SendMessage("```ᕕ(' >')ᕗᕕ(' >')ᕗᕕ(' >')ᕗ" + "\npls no bulli```");
                 });
+            cService.CreateCommand("next")
+                .Parameter("arg", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    if (e.Server.Id == 298452858888781825)
+                    {
+                        DateTime nem = new DateTime(2017, 6, 29, 19, 0, 0, DateTimeKind.Utc);
+                        TimeSpan cd = nem.Subtract(DateTime.UtcNow);
+                        await e.Channel.SendMessage("```The next event is " + cd.Days + " days, " + cd.Hours + " hours, " + cd.Minutes + " minutes, " + cd.Seconds + " seconds away.```");
+                    }
+                });
+
             //cService.CreateCommand("rename")
             //    .Parameter("arg", ParameterType.Unparsed)
             //    .Do(async (e) =>
