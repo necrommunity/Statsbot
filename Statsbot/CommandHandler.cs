@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace Statsbot
 {
 
-    public enum Character { All, Aria, Bard, Bolt, Cadence, Coda, Diamond, Dorian, Dove, Eli, Melody, Monk, Nocturna, Story }
+    public enum Character { All, Aria, Bard, Bolt, Cadence, Coda, Diamond, Dorian, Dove, Eli, Mary, Melody, Monk, Nocturna, Story, Tempo }
     public enum RunType { Deathless, Score, Speed }
-    public enum Mode { Standard, Hardmode, NoReturn }
+    public enum Mode { Standard, Hardmode, NoReturn, Phasing, Randomizer, Mystery }
     public enum Product { Classic, Amplified }
 
     public static class CommandHandler
@@ -24,12 +24,12 @@ namespace Statsbot
             if (MultiContains(q, new[] { "speed", "score", "deathless" }))
                 return ("Displays specific player's personal bests in a specific category."
                     + "\nUse \".speed, .score, or .deathless <name>\" to see the player's results in that category."
-                    + "\nAdd \"seeded\" to see the seeded leaderboards, \"classic\" to see results without the dlc, and \"hardmode\" or \"noreturn\" for the extra play modes."
+                    + "\nAdd \"seeded\" to see the seeded leaderboards, \"classic\" to see results without the dlc, and \"hardmode\" or \"noreturn\" etc for the extra play modes."
                     + "\nSteamID can be used instead of a name (\".speed #76561198000263514\").");
             if (MultiContains(q, new[] { "leaderboard", "lb" }))
                 return ("Displays a leaderboard."
                     + "\nUse \".leaderboard <character> <category>\" to see a leaderboard. Speed is the default in case no category is entered."
-                    + "\nAdd \"seeded\" to see the seeded leaderboards, \"classic\" to see results without the dlc, and \"hardmode\" or \"noreturn\" for the extra play modes."
+                    + "\nAdd \"seeded\" to see the seeded leaderboards, \"classic\" to see results without the dlc, and \"hardmode\" or \"noreturn\" etc for the extra play modes."
                     + "\nAdd \"&<offset>\" in the end to see the result starting at the specified offset.");
             if (MultiContains(q, new[] { "records", "stats" }))
                 return ("Displays a steam user's stats."
@@ -131,6 +131,15 @@ namespace Statsbot
             if (args.Contains("hard"))
                 filter.Mode = Mode.Hardmode;
 
+            if (args.Contains("phasing"))
+                filter.Mode = Mode.Phasing;
+
+            if (args.Contains("mystery"))
+                filter.Mode = Mode.Mystery;
+
+            if (args.Contains("random"))
+                filter.Mode = Mode.Randomizer;
+
             if (args.Contains("seeded"))
                 filter.Seeded = true;
 
@@ -179,8 +188,8 @@ namespace Statsbot
             sb.Append("Total playtime: " + time.Playtime_forever / 60 + " hours (" + time.Playtime_2weeks / 60 + " recently)\n\n");
 
             sb.Append("Deaths: " + stats["Deaths"] + " (" + (stats["Deaths"] / (float)(time.Playtime_forever / 60)) + " per hour)\n");
-            sb.Append("Green bats killed: " + stats["Bats"] + "\n\n");
-            sb.Append("Character clears ");
+            sb.Append("Green bats killed: " + stats["GreenBats"] + "\n\n");
+            sb.Append("Clears count");
             foreach (string s in (Enum.GetNames(typeof(Character))))
             {
                 if (stats[s] != 0)
@@ -192,15 +201,29 @@ namespace Statsbot
                     switch (s)
                     {
                         case "Cadence":
-                            sb.Append(" (" + stats["Speedruns"] + " sub-15, " + stats["Dailies"] + " dailies)");
+                            sb.Append(" (" + stats["Cadence_speed"] + " sub-15, " + stats["Dailies"] + " dailies, " + stats["Cadence_nr"] + " no return)");
+                            break;
+                        case "Nocturna":
+                            sb.Append(" (" + stats["Nocturna_speed"] + " sub-10, " + stats["Nocturna_hm"] + " hardmode)");
                             break;
                         case "Aria":
-                            sb.Append(" (" + stats["AriaLow"] + " low%)");
+                            sb.Append(" (" + stats["Aria_low"] + " low%)");
                             break;
                         case "All":
-                            sb.Append(" (" + stats["Lowest"] + " low%)");
+                            sb.Append(" (" + stats["All_low"] + " low%, " + stats["All_dlc"] + " dlc)");
                             break;
                     }
+                }
+            }
+            string[] modes = new string[] { "Phasing", "Randomizer", "Mystery", "All_mode" };
+            foreach (string s in modes)
+            {
+                if (stats[s] != 0)
+                {
+                    sb.Append("\n   " + s);
+                    for (int i = s.Length + Digits(stats[s]); i < 12; i++)
+                    { sb.Append(" "); }
+                    sb.Append(stats[s]);
                 }
             }
             return sb.ToString();
@@ -211,9 +234,9 @@ namespace Statsbot
 
             Category lb = new Category();
 
-            for (int i = 0; i < 15; i++)
+            for (int i = 0; i < 17; i++)
             {
-                if (i == 14)
+                if (i == 16)
                     return ("Please enter a valid character.");
                 if (InvariantContains(q, Enum.GetNames(typeof(Character))[i]))
                 {
@@ -251,6 +274,15 @@ namespace Statsbot
 
             if (q.Contains("hard"))
                 lb.Mode = Mode.Hardmode;
+
+            if (q.Contains("phasing"))
+                lb.Mode = Mode.Phasing;
+
+            if (q.Contains("mystery"))
+                lb.Mode = Mode.Mystery;
+
+            if (q.Contains("random"))
+                lb.Mode = Mode.Randomizer;
 
             if (q.Contains("seeded"))
                 lb.Seeded = true;

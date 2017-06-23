@@ -7,9 +7,6 @@ using System.Globalization;
 using Discord;
 using Discord.Commands;
 
-//todo:
-//order records by count
-//include everything in help
 
 namespace Statsbot
 {
@@ -74,6 +71,14 @@ namespace Statsbot
                 Console.ReadKey();
                 return;
             }
+
+            if (!System.IO.File.Exists(@"Stats.json"))
+            {
+                Console.Write("Please make sure the file \"Stats.json\" is located in the bin folder.");
+                Console.ReadKey();
+                return;
+            }
+
             racebot = new Racebot();
 
             //while (true) //debug mode essentially
@@ -154,6 +159,13 @@ namespace Statsbot
                 .Do(async (e) =>
                 {
                     await e.Channel.SendMessage("```ᕕ(' >')ᕗᕕ(' >')ᕗᕕ(' >')ᕗ" + "\npls no bulli```");
+                });
+            cService.CreateCommand("secret")
+                .Parameter("arg", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    if (e.User.Id == 86612976529838080 || e.User.Id == 155424249211781120)
+                        await e.Channel.SendMessage("```https://youtu.be/dQw4w9WgXcQ```");
                 });
             cService.CreateCommand("next")
                 .Parameter("arg", ParameterType.Unparsed)

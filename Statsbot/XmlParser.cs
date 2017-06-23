@@ -56,6 +56,12 @@ namespace Statsbot
                                     lb.Category.Mode = Mode.Hardmode;
                                 if (s.Contains("Return"))
                                     lb.Category.Mode = Mode.NoReturn;
+                                if (s.Contains("Random"))
+                                    lb.Category.Mode = Mode.Randomizer;
+                                if (s.Contains("Phasing"))
+                                    lb.Category.Mode = Mode.Phasing;
+                                if (s.Contains("Mystery"))
+                                    lb.Category.Mode = Mode.Mystery;
                                 for (int i = 0; i < 3; i++)
                                 {
                                     if (s.Contains(Enum.GetNames(typeof(RunType))[i]))
@@ -64,7 +70,7 @@ namespace Statsbot
                                         break;
                                     }
                                 }
-                                for (int i = 0; i < 14; i++)
+                                for (int i = 0; i < 16; i++)
                                 {
                                     if (s.Contains(Enum.GetNames(typeof(Character))[i]))
                                     {
