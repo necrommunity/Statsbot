@@ -20,7 +20,7 @@ namespace Statsbot
             Category cat = new Category();
             if (Product == "classic")
                 cat.Product = Statsbot.Product.Classic;
-            for (int i = 0; i < 14; i++)
+            for (int i = 0; i < 16; i++)
             {
                 if (Character.Equals(Enum.GetNames(typeof(Character))[i], StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -57,6 +57,15 @@ namespace Statsbot
                     cat.Mode = Statsbot.Mode.NoReturn;
                     break;
                 case "hard-mode":
+                    cat.Mode = Statsbot.Mode.Hardmode;
+                    break;
+                case "mystery":
+                    cat.Mode = Statsbot.Mode.Hardmode;
+                    break;
+                case "phasing":
+                    cat.Mode = Statsbot.Mode.Hardmode;
+                    break;
+                case "randomizer":
                     cat.Mode = Statsbot.Mode.Hardmode;
                     break;
             }
