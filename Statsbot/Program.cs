@@ -167,17 +167,6 @@ namespace Statsbot
                     if (e.User.Id == 86612976529838080 || e.User.Id == 155424249211781120)
                         await e.Channel.SendMessage("```https://youtu.be/dQw4w9WgXcQ```");
                 });
-            cService.CreateCommand("next")
-                .Parameter("arg", ParameterType.Unparsed)
-                .Do(async (e) =>
-                {
-                    if (e.Server.Id == 298452858888781825)
-                    {
-                        DateTime nem = new DateTime(2017, 6, 29, 19, 0, 0, DateTimeKind.Utc);
-                        TimeSpan cd = nem.Subtract(DateTime.UtcNow);
-                        await e.Channel.SendMessage("```The next event is " + cd.Days + " days, " + cd.Hours + " hours, " + cd.Minutes + " minutes, " + cd.Seconds + " seconds away.```");
-                    }
-                });
 
             //cService.CreateCommand("rename")
             //    .Parameter("arg", ParameterType.Unparsed)

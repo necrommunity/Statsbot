@@ -209,13 +209,16 @@ namespace Statsbot
                         case "Aria":
                             sb.Append(" (" + stats["Aria_low"] + " low%)");
                             break;
+                        case "Story":
+                            sb.Append(" (dlc only)");
+                            break;
                         case "All":
-                            sb.Append(" (" + stats["All_low"] + " low%, " + stats["All_dlc"] + " dlc)");
+                            sb.Append(" (" + stats["All_low"] + " low%, " + stats["All-dlc"] + " dlc)");
                             break;
                     }
                 }
             }
-            string[] modes = new string[] { "Phasing", "Randomizer", "Mystery", "All_mode" };
+            string[] modes = new string[] { "Phasing", "Randomizer", "Mystery" };
             foreach (string s in modes)
             {
                 if (stats[s] != 0)
