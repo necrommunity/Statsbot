@@ -204,7 +204,7 @@ namespace Statsbot
                             sb.Append(" (" + stats["Cadence_speed"] + " sub-15, " + stats["Dailies"] + " dailies, " + stats["Cadence_nr"] + " no return)");
                             break;
                         case "Nocturna":
-                            sb.Append(" (" + stats["Nocturna_speed"] + " sub-10, " + stats["Nocturna_hm"] + " hardmode)");
+                            sb.Append(" (" + stats["Nocturna_speed"] + " sub-15, " + stats["Nocturna_hm"] + " hardmode)");
                             break;
                         case "Aria":
                             sb.Append(" (" + stats["Aria_low"] + " low%)");
@@ -213,7 +213,7 @@ namespace Statsbot
                             sb.Append(" (dlc only)");
                             break;
                         case "All":
-                            sb.Append(" (" + stats["All_low"] + " low%, " + stats["DLC"] + " dlc)");
+                            sb.Append(" (" + stats["All_low"] + " low%, " + stats["DLC"] + " DLC)");
                             break;
                     }
                 }
