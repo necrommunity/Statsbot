@@ -56,7 +56,8 @@ namespace Statsbot
 
             config = Config.ReadConfig();
             database = Database.ReadConfig();
-            XmlParser.lbInfo = XmlParser.ParseIndex();
+            //XmlParser.lbInfo = XmlParser.ParseIndex();
+            XmlParser.ReadLeaderboards();
 
             if (config.DiscordToken == "" || config.SteamKey == "")
             {
@@ -84,7 +85,7 @@ namespace Statsbot
             //while (true) //debug mode essentially
             //{
             //    string arg = Console.ReadLine();
-            //    Console.WriteLine(Countdown());
+            //    Console.WriteLine(CommandHandler.Leaderboard(arg));
             //}
 
             client.ExecuteAndWait(async () => await client.Connect(config.DiscordToken, TokenType.Bot));
@@ -100,7 +101,7 @@ namespace Statsbot
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("```Statsbot v0.81. Type \".statsbot help\" for a list of commands.```");
+                    await e.Channel.SendMessage("```Statsbot v0.82. Type \".statsbot help\" for a list of commands.```");
                 });
             cService.CreateCommand("help")
                 .Parameter("arg", ParameterType.Unparsed)

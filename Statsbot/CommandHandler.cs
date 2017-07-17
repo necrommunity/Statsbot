@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 namespace Statsbot
 {
 
-    public enum Character { All, Aria, Bard, Bolt, Cadence, Coda, Diamond, Dorian, Dove, Eli, Mary, Melody, Monk, Nocturna, Story, Tempo }
-    public enum RunType { Deathless, Score, Speed }
-    public enum Mode { Standard, Hardmode, NoReturn, Phasing, Randomizer, Mystery }
-    public enum Product { Classic, Amplified }
+    //public enum Character { All, All_dlc ,Aria, Bard, Bolt, Cadence, Coda, Diamond, Dorian, Dove, Eli, Mary, Melody, Monk, Nocturna, Story, Tempo }
+    //public enum RunType { Deathless, Score, Speed }
+    //public enum Mode { Standard, Hardmode, NoReturn, Phasing, Randomizer, Mystery }
+    //public enum Product { Classic, Amplified }
 
     public static class CommandHandler
     {
@@ -192,7 +192,7 @@ namespace Statsbot
             sb.Append("Clears count");
             foreach (string s in (Enum.GetNames(typeof(Character))))
             {
-                if (stats[s] != 0)
+                if (s != "DLC" && stats[s] != 0)
                 {
                     sb.Append("\n   " + s);
                     for (int i = s.Length + Digits(stats[s]); i < 12; i++)
@@ -213,7 +213,7 @@ namespace Statsbot
                             sb.Append(" (dlc only)");
                             break;
                         case "All":
-                            sb.Append(" (" + stats["All_low"] + " low%, " + stats["All-dlc"] + " dlc)");
+                            sb.Append(" (" + stats["All_low"] + " low%, " + stats["DLC"] + " dlc)");
                             break;
                     }
                 }
@@ -237,9 +237,9 @@ namespace Statsbot
 
             Category lb = new Category();
 
-            for (int i = 0; i < 17; i++)
+            for (int i = 0; i < 18; i++)
             {
-                if (i == 16)
+                if (i == 17)
                     return ("Please enter a valid character.");
                 if (InvariantContains(q, Enum.GetNames(typeof(Character))[i]))
                 {
@@ -300,7 +300,10 @@ namespace Statsbot
             try { lb = XmlParser.lbInfo[category]; }
             catch { return ("Please enter a valid leaderboard."); }
 
-            List<SteamEntry> entries = XmlParser.ParseLeaderboard(lb, offset);
+            //List<SteamEntry> entries = XmlParser.ParseLeaderboard(lb, offset);
+            //ApiSender.GetSteamNames(entries);
+
+            List<SteamEntry> entries = SteamLB.Program.FetchEntries(lb.ID, offset);
             ApiSender.GetSteamNames(entries);
 
             if (entries.Count == 0)

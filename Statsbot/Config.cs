@@ -12,11 +12,15 @@ namespace Statsbot
     {
         public string SteamKey { get; set; }
         public string DiscordToken { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
 
         public Config()
         {
             SteamKey = "";
             DiscordToken = "";
+            Username = "";
+            Password = "";
         }
 
         public static Config ReadConfig()

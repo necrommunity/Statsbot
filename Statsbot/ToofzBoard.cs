@@ -13,19 +13,32 @@ namespace Statsbot
         public string Character { get; set; }
         public string Run { get; set; }
         public string Mode { get; set; }
-        public int Total { get; set; }
 
         public Category ToCategory()
         {
             Category cat = new Category();
             if (Product == "classic")
                 cat.Product = Statsbot.Product.Classic;
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < 17; i++)
             {
-                if (Character.Equals(Enum.GetNames(typeof(Character))[i], StringComparison.InvariantCultureIgnoreCase))
+                switch (i)
                 {
-                    cat.Char = (Character)i;
-                    break;
+                    case 0:
+                        if (Character == "all-characters")
+                            cat.Char = Statsbot.Character.All;
+                        break;
+                    case 1:
+                        if (Character == "all-characters-amplified")
+                            cat.Char = Statsbot.Character.DLC;
+                        break;
+                    case 15:
+                        if (Character == "story-mode")
+                            cat.Char = Statsbot.Character.Story;
+                        break;
+                    default:
+                        if (Character.Equals(Enum.GetNames(typeof(Character))[i], StringComparison.InvariantCultureIgnoreCase))
+                            cat.Char = (Character)i;
+                        break;
                 }
             }
             switch (Run)
@@ -51,22 +64,22 @@ namespace Statsbot
             switch (Mode)
             {
                 case "standard":
-                    cat.Mode =Statsbot.Mode.Standard;
+                    cat.Mode = Statsbot.Mode.Standard;
                     break;
                 case "no-return":
                     cat.Mode = Statsbot.Mode.NoReturn;
                     break;
-                case "hard-mode":
+                case "hard":
                     cat.Mode = Statsbot.Mode.Hardmode;
                     break;
                 case "mystery":
-                    cat.Mode = Statsbot.Mode.Hardmode;
+                    cat.Mode = Statsbot.Mode.Mystery;
                     break;
                 case "phasing":
-                    cat.Mode = Statsbot.Mode.Hardmode;
+                    cat.Mode = Statsbot.Mode.Phasing;
                     break;
                 case "randomizer":
-                    cat.Mode = Statsbot.Mode.Hardmode;
+                    cat.Mode = Statsbot.Mode.Randomizer;
                     break;
             }
             return cat;

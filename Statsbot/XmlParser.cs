@@ -19,7 +19,22 @@ namespace Statsbot
 
         public static void RegisterLeaderboards(Dictionary<Category, Leaderboard> lbInfo)
         {
-            File.WriteAllText(@"Leaderboards.json", JsonConvert.SerializeObject(lbInfo, Newtonsoft.Json.Formatting.Indented));
+            var list = new List<Leaderboard>();
+            foreach (Leaderboard lb in lbInfo.Values)
+            {
+                list.Add(lb);
+            }
+            File.WriteAllText(@"Leaderboards.json", JsonConvert.SerializeObject(list, Newtonsoft.Json.Formatting.Indented));
+        }
+
+        public static void ReadLeaderboards()
+        {
+            var list = JsonConvert.DeserializeObject<List<Leaderboard>>(File.ReadAllText(@"Leaderboards.json"));
+            lbInfo = new Dictionary<Category, Leaderboard>();
+            foreach (Leaderboard lb in list)
+            {
+                lbInfo.Add(lb.Category, lb);
+            }
         }
 
         public static Dictionary<Category, Leaderboard> ParseIndex()
