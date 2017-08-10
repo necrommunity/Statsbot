@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ToofzBot
+namespace Statsbot
 {
     public class Player
     {
@@ -13,7 +13,7 @@ namespace ToofzBot
         public string Avatar { get; set; }
     }
 
-    public class PlayerResults
+    public class PlayerNames
     {
         public Player[] Players { get; set; }
     }

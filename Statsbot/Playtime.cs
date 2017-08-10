@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace ToofzBot
+namespace Statsbot
 {
-    public class SteamResponse
+    public class SteamPlaytimeResponse
     {
         public PlaytimeResponse Response { get; set; }
     }
