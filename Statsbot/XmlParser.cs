@@ -15,6 +15,8 @@ namespace Statsbot
     public static class XmlParser
     {
 
+        //currently not in use except ReadLeaderboards()
+
         public static Dictionary<Category, Leaderboard> lbInfo;
 
         public static void RegisterLeaderboards(Dictionary<Category, Leaderboard> lbInfo)

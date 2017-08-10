@@ -218,7 +218,7 @@ namespace Statsbot
                     }
                 }
             }
-            string[] modes = new string[] { "Phasing", "Randomizer", "Mystery" };
+            string[] modes = new string[] { "Phasing", "Rando", "Mystery" };
             foreach (string s in modes)
             {
                 if (stats[s] != 0)
@@ -236,6 +236,7 @@ namespace Statsbot
         {
 
             Category lb = new Category();
+
 
             for (int i = 0; i < 18; i++)
             {
@@ -300,6 +301,7 @@ namespace Statsbot
             try { lb = XmlParser.lbInfo[category]; }
             catch { return ("Please enter a valid leaderboard."); }
 
+            //retrieves through the API, currently not in use
             //List<SteamEntry> entries = XmlParser.ParseLeaderboard(lb, offset);
             //ApiSender.GetSteamNames(entries);
 

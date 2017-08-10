@@ -45,7 +45,7 @@ namespace Statsbot
                         return 9;
                     if (m.RawText.StartsWith(".sb"))
                         return 3;
-                    if (m.RawText.StartsWith(".") && (m.Channel.IsPrivate || m.Server.Id != 214389515417026561)) //prevent conflict with inc's bot
+                    if (m.RawText.StartsWith(".") && (m.Server == null || m.Server.Id != 214389515417026561)) //prevent conflict with inc's bot
                         return 1;
                     return -1;
                 };
@@ -56,7 +56,7 @@ namespace Statsbot
 
             config = Config.ReadConfig();
             database = Database.ReadConfig();
-            //XmlParser.lbInfo = XmlParser.ParseIndex();
+            //XmlParser.lbInfo = XmlParser.ParseIndex(); //currently not in use
             XmlParser.ReadLeaderboards();
 
             if (config.DiscordToken == "" || config.SteamKey == "")

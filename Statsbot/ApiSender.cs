@@ -66,6 +66,7 @@ namespace Statsbot
 
         public static string GetLeaderboard(string id, int offset) // https://partner.steamgames.com/documentation/community_data
         {
+            //currently not in use
             string response;
             try
             {
