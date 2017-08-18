@@ -81,31 +81,31 @@ namespace Statsbot
             return q;
         }
 
-        public string DisplayResults(string q, Discord.User user)
-        {
+        //public string DisplayResults(string q, Discord.User user)
+        //{
 
-            int offset = 0;
+        //    int offset = 0;
 
-            if (q.Contains("&"))
-            {
-                bool pos = int.TryParse(q.Split('&')[1], out offset);
-                if (!pos)
-                    return ("Please enter a valid offset.");
-                q = q.Split('&')[0];
-            }
+        //    if (q.Contains("&"))
+        //    {
+        //        bool pos = int.TryParse(q.Split('&')[1], out offset);
+        //        if (!pos)
+        //            return ("Please enter a valid offset.");
+        //        q = q.Split('&')[0];
+        //    }
 
-            if (q == "")
-                q = user.Name;
+        //    if (q == "")
+        //        q = user.Name;
 
-            string results = GetResults(q, offset);
-            if (results == "")
-                return ("No necrobot results found for \"" + q + "\".");
+        //    string results = GetResults(q, offset);
+        //    if (results == "")
+        //        return ("No necrobot results found for \"" + q + "\".");
 
-            StringBuilder sb = new StringBuilder();
-            sb.Append("Displaying requested necrobot results for " + q + " \n\n");
-            sb.Append(results);
-            return (sb.ToString());
-        }
+        //    StringBuilder sb = new StringBuilder();
+        //    sb.Append("Displaying requested necrobot results for " + q + " \n\n");
+        //    sb.Append(results);
+        //    return (sb.ToString());
+        //}
 
 
         public static string TimeToString(int time)
