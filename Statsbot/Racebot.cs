@@ -97,7 +97,6 @@ namespace Statsbot
                             if (i >= offset) //starts reading at specified offset
                             {
                                 sb.Append(r.GetDateTime(0).ToString("yyyy-MM-dd HH:mm") + " --- ");
-                                int level = r.GetInt16(1);
                                 if (r.GetInt16(3) == 1)
                                     sb.Append("WIN ");
                                 else
@@ -150,6 +149,7 @@ namespace Statsbot
 
             StringBuilder sb = new StringBuilder();
             sb.Append("Displaying requested necrobot results for " + q + " \n\n");
+            results = results.Replace("`", "");
             sb.Append(results);
             return (sb.ToString());
         }
@@ -176,6 +176,7 @@ namespace Statsbot
 
             StringBuilder sb = new StringBuilder();
             sb.Append("Displaying requested S6 results for " + q + " \n\n");
+            results = results.Replace("`", "");
             sb.Append(results);
             return (sb.ToString());
         }
