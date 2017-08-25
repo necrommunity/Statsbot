@@ -153,7 +153,13 @@ namespace Statsbot
                 .Parameter("arg", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("```" + racebot.DisplayResults(e.GetArg(0), e.User) + "```");
+                    await e.Channel.SendMessage("```" + racebot.DisplayNecrobot(e.GetArg(0), e.User) + "```");
+                });
+            cService.CreateCommand("s6")
+                .Parameter("arg", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendMessage("```" + racebot.DisplayS6(e.GetArg(0), e.User) + "```");
                 });
             cService.CreateCommand("penguin")
                 .Parameter("arg", ParameterType.Unparsed)
