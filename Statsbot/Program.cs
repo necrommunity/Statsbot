@@ -18,7 +18,8 @@ namespace Statsbot
 
         static void Main(string[] args)
         {
-            Client.DoThing();
+            Client client = new Client();
+            client.Connect();
             //new Program().Start();
         }
 

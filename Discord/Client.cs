@@ -4,35 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebSocketSharp;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Discord
 {
     public class Client
     {
-        //https://github.com/SinisterRectus/Discordia/blob/master/discordia/client/Client.lua
-        // https://github.com/RogueException/Discord.Net/blob/7b99c6003d09783269430fb5a0f7265850b766f8/src/Discord.Net.WebSocket/Net/DefaultWebSocketClient.cs
-        /*
-         * options (token)
-         * api
-         * socket
-         * user(s)
-         * guilds
-         * channels
-         */
-        static public void DoThing()
-        {
-            using (var ws = new WebSocket("ws://echo.websocket.org"))
-            {
-                ws.OnMessage += (sender, e) =>
-                    Console.WriteLine("Laputa says: " + e.Data);
+        //options (token)
+        //api
+        private Socket ws;
+        //user(s)
+        //guilds
+        //channels
+        //logger
 
-                ws.Connect();
-                ws.Send("BALUS");
-                Console.ReadKey(true);
-            }
+        public event EventHandler<EventArgs> SocketOpened;
+
+        string token = "Mjc4MTQ1MTIzNDc5NzE1ODQw.DI8xUw.wbjiJ-_jDrGNqzRnFgG3d7pio2E";
+        string url = "https://discordapp.com/api/v6/gateway";
+
+        public void Connect()
+        {
         }
-        //run() - set token to api, connect to gateway
-        //stop() - socket.disconnect()
-        //connect to 
+
     }
 }
