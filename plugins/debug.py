@@ -1,12 +1,15 @@
 import sys
+import random
 sys.path.append('..')
-import toofz
+import toofz, steam, category
+
+
+index = category.indexer()
 
 while True:
 	print('q?')
 	aa = input()
 	if aa == 'exit':
 		sys.exit()
-	#print(toofz.entries('naymin', 'score', aa))
-	#print(toofz.list(['wil', 'revalize', 'goof', 'baba', 'lilac', 'cheesy', 'staekk', 'grimy', 'yamir', 'tufwfo', 'mac', 'axem', 'abu', 'fubz', 'thedarkfreack'], 'speed'))
-	print(toofz.score(aa))
+	lb = index.get_certain_board(aa)
+	print(steam.fetch_lb(lb))
