@@ -52,7 +52,9 @@ class MainPlugin(Plugin):
 			return
 
 		embed.title = 'Displaying top player results for "{}":'.format(args)
+		embed.set_thumbnail(url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/search.png')
 		embed.add_field(name='-', value=results)
+
 		event.channel.send_message('', embed=embed)
 
 
@@ -96,7 +98,7 @@ class MainPlugin(Plugin):
 		
 		embed.title = "{} #{}".format(steam_user.name, steam_user.steam_id)
 		embed.timestamp = steam_user.updated
-		embed.set_footer(text='Fetched from toofz | Last updated: ', icon_url='http://crypt.toofz.com/favicon-96x96.png')
+		embed.set_footer(text='Fetched from toofz | Last updated: ', icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/toofz.png')
 		embed.set_thumbnail(url=steam_user.avatar)
 		embed.set_author(name='Displaying {} results ({}, {})'.format(run_name(runtype, matches[0].seeded), matches[0].ver, matches[0].extra))
 		embed.add_field(name='-', value=results)
@@ -139,7 +141,8 @@ class MainPlugin(Plugin):
 			return
 
 		embed.title = 'Displaying {} leaderboard for {} ({}, {})'.format(run_name(target.run, target.seeded), target.char, target.ver, target.extra)
-		embed.set_footer(text='Fetched from Steam', icon_url='http://steamcommunity.com/favicon.ico')
+		embed.set_footer(text='Fetched from Steam', icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/steam.png')
+		embed.set_thumbnail(url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/{}.png'.format(target.char))
 		embed.add_field(name='-', value=results)
 
 		event.channel.send_message('', embed=embed)
