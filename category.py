@@ -24,15 +24,8 @@ def pad(q, i):
 		q = 'All (9)'
 	if i == 0:
 		i = len(q)
-	print('{},{}, {}'.format(i, len(q), i - len(q)))
 	q += ' ' * (i - len(q))
 	return q
-
-
-def run_name(run, seeded):
-	if seeded:
-		return 'Seeded {}'.format(run)
-	return run
 
 
 def score_string(s, m): #ty jakk <3

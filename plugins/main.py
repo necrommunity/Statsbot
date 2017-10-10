@@ -1,12 +1,16 @@
-import sys
-sys.path.append('..')
 import toofz, steam, category
 
 from disco.bot import Plugin
 from disco.types.message import MessageEmbed
 
 
-class BasicPlugin(Plugin):
+def run_name(run, seeded):
+	if seeded:
+		return 'Seeded {}'.format(run)
+	return run
+
+
+class MainPlugin(Plugin):
 
 	def load(self, event):
 		self.index = category.indexer()
@@ -86,7 +90,7 @@ class BasicPlugin(Plugin):
 
 		results = toofz.entries(steam_user, matches)
 		if results == '':
-			embed.title = 'No results found for {} in the {} category ({}, {}).'.format(steam_user.name, category.run_name(runtype, matches[0].seeded), matches[0].ver, matches[0].extra)
+			embed.title = 'No results found for {} in the {} category ({}, {}).'.format(steam_user.name, run_name(runtype, matches[0].seeded), matches[0].ver, matches[0].extra)
 			event.channel.send_message('', embed=embed)
 			return
 		
@@ -94,7 +98,7 @@ class BasicPlugin(Plugin):
 		embed.timestamp = steam_user.updated
 		embed.set_footer(text='Fetched from toofz | Last updated: ', icon_url='http://crypt.toofz.com/favicon-96x96.png')
 		embed.set_thumbnail(url=steam_user.avatar)
-		embed.set_author(name='Displaying {} results ({}, {})'.format(category.run_name(runtype, matches[0].seeded), matches[0].ver, matches[0].extra))
+		embed.set_author(name='Displaying {} results ({}, {})'.format(run_name(runtype, matches[0].seeded), matches[0].ver, matches[0].extra))
 		embed.add_field(name='-', value=results)
 
 		event.channel.send_message('', embed=embed)
@@ -128,8 +132,19 @@ class BasicPlugin(Plugin):
 					event.channel.send_message('', embed=embed)
 					return
 
-		
+		results = steam.fetch_lb(target, offset)
+		if results == '':
+			embed.title = 'No entries found for {} in the {} category ({}, {}).'.format(target.char, run_name(target.run, target.seeded), target.ver, target.extra)
+			event.channel.send_message('', embed=embed)
+			return
 
+		embed.title = 'Displaying {} leaderboard for {} ({}, {})'.format(run_name(target.run, target.seeded), target.char, target.ver, target.extra)
+		embed.set_footer(text='Fetched from Steam', icon_url='http://steamcommunity.com/favicon.ico')
+		embed.add_field(name='-', value=results)
+
+		event.channel.send_message('', embed=embed)
+
+	
 	# @Plugin.listen('MessageCreate')
 	# def on_message_create(self, event):
 	# 	msg = event.message

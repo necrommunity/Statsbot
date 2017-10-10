@@ -1,5 +1,4 @@
 import sys
-import random
 sys.path.append('..')
 import toofz, steam, category
 
