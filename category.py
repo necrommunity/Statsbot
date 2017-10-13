@@ -1,8 +1,8 @@
 import steam
 
 characters = ['All Chars DLC', 'All Chars', 'Story', 'Aria', 'Bard', 'Bolt',
-				'Coda', 'Dorian', 'Dove', 'Eli', 'Melody', 'Monk',
-				'Nocturna', 'Diamond', 'Tempo', 'Mary']
+				'Cadence', 'Coda', 'Diamond', 'Dorian', 'Dove', 'Eli',
+				'Mary', 'Melody', 'Monk', 'Nocturna', 'Tempo']
 run_type = ['Speed', 'Score', 'Deathless']
 extras = ['No Return', 'Hard', 'Phasing', 'Mystery', 'Randomizer']
 version = ['Amplified', 'Classic']
@@ -36,16 +36,17 @@ def score_string(s, m): #ty jakk <3
 		s, ms = divmod(ms, 1000)
 		ms = round(ms / 10.0)
 
+		if ms == 100:
+			ms = 99
+
 		result = ''
 
-		minutePad='%02d:'
 		if h:
 			result += '%d:'%(h)
 		else:
 			result += '  '
-		if m or h:
-			result += minutePad%(m)
 
+		result += '%02d:'%(m)
 		result += '%02d.%02d'%(s, ms)
 		return result
 
@@ -88,10 +89,10 @@ def rank_string(rank):
 def extract_char(q):
 	for c in characters:
 		if c == 'All Chars DLC':
-			if caseless_in(['All Characters (DLC)', 'DLC' '13'], q):
+			if caseless_in([c, 'DLC', '13'], q):
 				return c
 		if c == 'All Chars':
-			if caseless_in(['All Characters', 'All', '9'], q):
+			if caseless_in([c, 'All', '9'], q):
 				return c
 		if caseless_in(c, q):
 			return c
@@ -108,7 +109,7 @@ def extract_run(q,):
 def extract_extra(q):
 	for e in extras:
 		if e == 'No Return':
-			if caseless_in('Return', q):
+			if caseless_in(['Return', 'NR'], q):
 				return e
 		elif e == 'Randomizer':
 			if caseless_in('Rando', q):

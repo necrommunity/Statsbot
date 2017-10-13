@@ -1,8 +1,11 @@
 import toofz, steam, category
 
+from urllib.parse import quote
 from disco.bot import Plugin
 from disco.types.message import MessageEmbed
 
+
+ecolor = 0x00AD96
 
 def run_name(run, seeded):
 	if seeded:
@@ -18,34 +21,74 @@ class MainPlugin(Plugin):
 
 	@Plugin.command('reload', oob=True)
 	def on_reload(self, event):
-		try:
-			user = event.member.name
-		except:
-			user = event.author.username
+		user = event.author.username
 		if user != 'Naymin':
-			event.msg.reply('please stop')
 			return
 		self.reload()
 		event.msg.reply('Reloaded!')
 
 
 	@Plugin.command('version')
-	def on_info(self, event):
-		event.msg.reply('~~Role-bot v0.57~~ maybe statsbot.')
+	def on_version(self, event):
+		embed = MessageEmbed()
+		embed.color = ecolor
+		embed.title = 'Statsbot v0.92. Use `.help` for more info.'
+		event.channel.send_message('', embed=embed)
+
+
+	@Plugin.command('help', '[args:str]')
+	def on_help(self, event, args=''):
+
+		args = args.lower()
+		embed = MessageEmbed()
+		embed.color = ecolor
+
+		if args == '':
+			embed.title = 'Statsbot is a bot which retrieves Crypt of the Necrodancer player stats'
+			embed.description = '''\nAvailable commands:
+								\n`.search`, `.speed`, `.score`, `.deathless`, `.leaderboard`, `.stats`.
+								\nUse `.help command` for more info about a particular command.'''
+			event.channel.send_message('', embed=embed)
+			return
+		if args == 'search':
+			embed.title = 'Search for players and their steam IDs'
+			embed.description = 'Use `.search` `name` to see a list of results.'
+			event.channel.send_message('', embed=embed)
+			return
+		if args == 'speed' or args == 'score' or args == 'deathless':
+			embed.title = "Display player's personal bests in a specific category"
+			embed.description = '''Use `.speed`, `.score` or`.deathless` `name`.
+								\nAdd `seeded`, `classic`, `hardmode`, `mystery` etc to filter the results.
+								\nSteamID can be used instead of a name by prefixing it with a `#`.'''
+			event.channel.send_message('', embed=embed)
+			return
+		if args == 'leaderboard':
+			embed.title = "Display an in-game leaderboard"
+			embed.description = '''Use `.leaderboard` `character` `category`.
+								\nAdd `seeded`, `classic`, `hardmode`, `mystery` etc to filter the results.
+								\nAdjust entries offset by adding `-number`.'''
+			event.channel.send_message('', embed=embed)
+			return
+		if args == 'stats':
+			embed.title = "Display misc statistics recorded by steam"
+			embed.description = 'Use `.stats` `name`.'
+			event.channel.send_message('', embed=embed)
+			return
+		
 
 
 	@Plugin.command('search', '[args:str...]')
 	def on_search(self, event, args=''):
 
 		embed = MessageEmbed()
-		embed.color = 0x00AD96
+		embed.color = ecolor
 
 		if args == '':
 			embed.title = 'Please enter a name to search for.'
 			event.channel.send_message('', embed=embed)
 			return
 
-		results = toofz.search(args)
+		results = toofz.search(quote(args))
 		if results == '':
 			embed.title = 'No players found called "{}".'.format(args)
 			event.channel.send_message('', embed=embed)
@@ -64,7 +107,7 @@ class MainPlugin(Plugin):
 	def on_entries(self, event, args=''):
 
 		embed = MessageEmbed()
-		embed.color = 0x00AD96
+		embed.color = ecolor
 
 		try:
 			user = event.member.name
@@ -74,10 +117,13 @@ class MainPlugin(Plugin):
 		if args != '':
 			user = args.split()[0]
 			args = args[len(user)+1:]
+
 		if user[0] == '#':
 			user = user[1:]
+			steam_user = toofz.fill_user(user)
+		else:
+			steam_user = toofz.get_top(quote(user))
 
-		steam_user = toofz.get_top(user)
 		if not steam_user:
 			embed.title = 'No players found called "{}".'.format(user)
 			event.channel.send_message('', embed=embed)
@@ -111,28 +157,30 @@ class MainPlugin(Plugin):
 	def on_leaderboard(self, event, args =''):
 
 		embed = MessageEmbed()
-		embed.color = 0x00AD96
+		embed.color = ecolor
 
 		# if args == '':
 		# 	embed.title = 'Please enter a leaderboard to search for.'
 		# 	event.channel.send_message('', embed=embed)
 		# 	return
 
-		target = self.index.get_certain_board(args)
+		offset = 1
+		for arg in args.split():
+			if arg[0] == '-' or arg[0] == '&':
+				try:
+					offset = int(arg[1:])
+					args = args.replace(arg, '')
+				except:
+					embed.title = 'Please enter a valid offset.'
+					event.channel.send_message('', embed=embed)
+					return
+
+		target = self.index.get_certain_board(quote(args))
 		if not target:
 			embed.title = 'No leaderboards found. Is this a valid category?'
 			event.channel.send_message('', embed=embed)
 			return
 
-		offset = 1
-		for arg in args:
-			if arg[0] == '-':
-				try:
-					offset = int(arg[1:])
-				except:
-					embed.title = 'Please enter a valid offset.'
-					event.channel.send_message('', embed=embed)
-					return
 
 		results = steam.fetch_lb(target, offset)
 		if results == '':
@@ -142,7 +190,42 @@ class MainPlugin(Plugin):
 
 		embed.title = 'Displaying {} leaderboard for {} ({}, {})'.format(run_name(target.run, target.seeded), target.char, target.ver, target.extra)
 		embed.set_footer(text='Fetched from Steam', icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/steam.png')
-		embed.set_thumbnail(url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/{}.png'.format(target.char))
+		embed.set_thumbnail(url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/{}.png'.format(target.char).replace(' ','%20'))
+		embed.add_field(name='-', value=results)
+
+		event.channel.send_message('', embed=embed)
+
+
+	@Plugin.command('stats', '[args:str...]')
+	def on_stats(self, event, args=''):
+
+		embed = MessageEmbed()
+		embed.color = ecolor
+
+		try:
+			user = event.member.name
+		except:
+			user = event.author.username
+
+		if args != '':
+			user = args.split()[0]
+			args = args[len(user)+1:]
+
+		steam_user = toofz.get_top(quote(user))
+		if not steam_user:
+			embed.title = 'No players found called "{}".'.format(user)
+			event.channel.send_message('', embed=embed)
+			return
+
+		results = steam.get_stats(steam_user)
+		if not results:
+			embed.title = 'Failed to retrieve stats for {} (profile is likely private).'.format(steam_user.name)
+			event.channel.send_message('', embed=embed)
+			return
+		
+		embed.title = "{} #{}".format(steam_user.name, steam_user.steam_id)
+		embed.set_footer(text='Fetched from Steam', icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/steam.png')
+		embed.set_thumbnail(url=steam_user.avatar)
 		embed.add_field(name='-', value=results)
 
 		event.channel.send_message('', embed=embed)
