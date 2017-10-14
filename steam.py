@@ -79,10 +79,9 @@ def fetch_lb(lb, offset=1):
 
 
 def get_players(ids):
-	request = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={}&steamids='.format(steamkey)
-	for i in ids:
-		request += i + ','
-	response = urllib.request.urlopen(request).read()
+	joint = ','.join(ids)
+	url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={}&steamids={}'.format(steamkey, joint)
+	response = urllib.request.urlopen(url).read()
 	cont = json.loads(response.decode('utf-8'))
 	
 	d = {}
@@ -93,13 +92,11 @@ def get_players(ids):
 
 def get_stats(user):
 	try:
-		request = 'http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?key={}&appid=247080&steamid={}'.format(steamkey, user.steam_id)
-		response = urllib.request.urlopen(request).read()
+		response = urllib.request.urlopen('http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?key={}&appid=247080&steamid={}'.format(steamkey, user.steam_id)).read()
 		cont = json.loads(response.decode('utf-8'))
 		stats = cont['playerstats']['stats']
 
-		request = 'http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={}&steamid={}'.format(steamkey, user.steam_id)
-		response = urllib.request.urlopen(request).read()
+		response = urllib.request.urlopen('http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={}&steamid={}'.format(steamkey, user.steam_id)).read()
 		cont = json.loads(response.decode('utf-8'))
 		for game in cont['response']['games']:
 			if game['appid'] == 247080:
@@ -139,7 +136,8 @@ def get_stats(user):
 				extra += ' ({} sub 15, {} hardmode)'.format(d['Nocturna speed'], d['HM'])
 			string += '   `{}{}{}{}`\n'.format(category.pad(char, 10), ' '*(5-dig(d[char])) ,d[char], extra)
 	for e in ['Phasing', 'Rando', 'Mystery']:
-		string += '   `{}{}{}`\n'.format(category.pad(e, 10), ' '*(5-dig(d[e])) ,d[e])
+		if d[e] != 0:		
+			string += '   `{}{}{}`\n'.format(category.pad(e, 10), ' '*(5-dig(d[e])) ,d[e])
 
 	return string
 	
