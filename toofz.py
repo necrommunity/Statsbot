@@ -13,7 +13,7 @@ def search(q):
 	for item in cont['players']:
 		if i >= 5:
 			break
-		string += '`{}\n\t#{}`\n'.format(item['display_name'], item['id'])
+		string += '{}\n\t#{}\n'.format(item['display_name'], item['id'])
 		i += 1
 	return string
 	
@@ -51,10 +51,10 @@ def entries(user, matches):
 	for item in cont['entries']:
 		for m in matches:
 			if item['leaderboard']['id'] == m.lbid:
-				char = category.pad(m.char, 10)
+				char = category.pad(m.char, 9)
 				score = category.score_string(item['score'], m)
 				rank = category.rank_string(item['rank'])
-				string += "`{}  {}   {}`\n".format(char, score, rank)
+				string += "{}  {}   {}\n".format(char, score, rank)
 	
 	return (string)
 

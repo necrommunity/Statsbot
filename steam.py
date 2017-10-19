@@ -74,7 +74,7 @@ def fetch_lb(lb, offset=1):
 		rank = '0' * (pad-dig(rank)) + str(rank) +'.'
 		score = category.score_string(int(e.find('score').text), lb)
 		player = profiles[e.find('steamid').text]
-		string += '`{}\t{}\t{}`\n'.format(rank, score, player)
+		string += '{}  {}  {}\n'.format(rank, score, player)
 	return string
 
 
@@ -118,10 +118,10 @@ def get_stats(user):
 			d[s] = 0
 
 	string = ''
-	string += '`Playtime: {} hours ({} recently)`\n\n'.format(int(time_ever/60), round(time_2weeks/60, 3))
-	string += '`Deaths: {} ({} per hour)`\n'.format(d['Deaths'], round(int(d['Deaths']) / (time_ever/60), 5))
-	string += '`Green bats: {}`\n\n'.format(d['GreenBats'])
-	string += '`Clears count`\n'
+	string += 'Playtime: {} hours ({} recently)\n\n'.format(int(time_ever/60), round(time_2weeks/60, 3))
+	string += 'Deaths: {} ({} per hour)\n'.format(d['Deaths'], round(int(d['Deaths']) / (time_ever/60), 5))
+	string += 'Green bats: {}\n\n'.format(d['GreenBats'])
+	string += 'Clears count\n'
 
 	for char in category.characters:
 		if d[char] != 0:
@@ -131,13 +131,13 @@ def get_stats(user):
 			if char == 'Aria':
 				extra = ' ({} low%)'.format(d['Aria low'])
 			if char == 'Cadence':
-				extra = ' ({} sub-15, {} dailies, {} no-return)'.format(d['Cadence speed'], d['Dailies'], d['NR'])
+				extra = ' ({} sub-15{} no-r)'.format(d['Cadence speed'], d['NR'])
 			if char == 'Nocturna':
-				extra += ' ({} sub 15, {} hardmode)'.format(d['Nocturna speed'], d['HM'])
-			string += '   `{}{}{}{}`\n'.format(category.pad(char, 10), ' '*(5-dig(d[char])) ,d[char], extra)
-	for e in ['Phasing', 'Rando', 'Mystery']:
+				extra += ' ({} sub-15, {} hard)'.format(d['Nocturna speed'], d['HM'])
+			string += '   {}{}{}{}\n'.format(category.pad(char, 9), ' '*(5-dig(d[char])) ,d[char], extra)
+	for e in ['Dailies', 'Phasing', 'Rando', 'Mystery']:
 		if d[e] != 0:		
-			string += '   `{}{}{}`\n'.format(category.pad(e, 10), ' '*(5-dig(d[e])) ,d[e])
+			string += '   {}{}{}\n'.format(category.pad(e, 9), ' '*(5-dig(d[e])) ,d[e])
 
 	return string
 	

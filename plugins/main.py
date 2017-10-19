@@ -96,7 +96,7 @@ class MainPlugin(Plugin):
 
 		embed.title = 'Displaying top player results for "{}":'.format(args)
 		embed.set_thumbnail(url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/search.png')
-		embed.add_field(name='-', value=results)
+		embed.add_field(name='-', value='`{}`'.format(results))
 
 		event.channel.send_message('', embed=embed)
 
@@ -144,10 +144,10 @@ class MainPlugin(Plugin):
 		
 		embed.title = "{} #{}".format(steam_user.name, steam_user.steam_id)
 		embed.timestamp = steam_user.updated
-		embed.set_footer(text='Fetched from toofz | Last updated: ', icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/toofz.png')
+		embed.set_footer(text='Last updated: ', icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/toofz.png')
 		embed.set_thumbnail(url=steam_user.avatar)
 		embed.set_author(name='Displaying {} results ({}, {})'.format(run_name(runtype, matches[0].seeded), matches[0].ver, matches[0].extra))
-		embed.add_field(name='-', value=results)
+		embed.add_field(name='-', value='`{}`'.format(results))
 
 		event.channel.send_message('', embed=embed)
 
@@ -189,9 +189,9 @@ class MainPlugin(Plugin):
 			return
 
 		embed.title = 'Displaying {} leaderboard for {} ({}, {})'.format(run_name(target.run, target.seeded), target.char, target.ver, target.extra)
-		embed.set_footer(text='Fetched from Steam', icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/steam.png')
+		embed.set_footer(icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/steam.png')
 		embed.set_thumbnail(url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/{}.png'.format(target.char).replace(' ','%20'))
-		embed.add_field(name='-', value=results)
+		embed.add_field(name='-', value='`{}`'.format(results))
 
 		event.channel.send_message('', embed=embed)
 
@@ -224,9 +224,9 @@ class MainPlugin(Plugin):
 			return
 		
 		embed.title = "{} #{}".format(steam_user.name, steam_user.steam_id)
-		embed.set_footer(text='Fetched from Steam', icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/steam.png')
+		embed.set_footer(icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/steam.png')
 		embed.set_thumbnail(url=steam_user.avatar)
-		embed.add_field(name='-', value=results)
+		embed.add_field(name='-', value='`{}`'.format(results))
 
 		event.channel.send_message('', embed=embed)
 
