@@ -144,7 +144,7 @@ class MainPlugin(Plugin):
 		
 		embed.title = "{} #{}".format(steam_user.name, steam_user.steam_id)
 		embed.timestamp = steam_user.updated
-		embed.set_footer(text='Last updated: ', icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/toofz.png')
+		embed.set_footer(text='Last updated', icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/python/icons/toofz.png')
 		embed.set_thumbnail(url=steam_user.avatar)
 		embed.set_author(name='Displaying {} results ({}, {})'.format(run_name(runtype, matches[0].seeded), matches[0].ver, matches[0].extra))
 		embed.add_field(name='-', value='`{}`'.format(results))
@@ -211,7 +211,12 @@ class MainPlugin(Plugin):
 			user = args.split()[0]
 			args = args[len(user)+1:]
 
-		steam_user = toofz.get_top(quote(user))
+		if user[0] == '#':
+			user = user[1:]
+			steam_user = toofz.fill_user(user)
+		else:
+			steam_user = toofz.get_top(quote(user))
+
 		if not steam_user:
 			embed.title = 'No players found called "{}".'.format(user)
 			event.channel.send_message('', embed=embed)

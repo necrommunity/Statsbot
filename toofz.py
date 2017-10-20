@@ -32,7 +32,7 @@ def get_top(name):
 
 def fill_user(steam_id):
 
-	response = urllib.request.urlopen('https://api.toofz.com/players/{}/entries'.format(steam_id)).read()
+	response = urllib.request.urlopen('https://api.toofz.com/players/{}/entries?lbids=2047569,739999'.format(steam_id)).read()
 	cont = json.loads(response.decode('utf-8'))
 	try:
 		player = cont['player']
@@ -44,7 +44,8 @@ def fill_user(steam_id):
 
 def entries(user, matches):
 
-	response = urllib.request.urlopen('https://api.toofz.com/players/{}/entries'.format(user.steam_id)).read()
+	lbs = ','.join(matches)
+	response = urllib.request.urlopen('https://api.toofz.com/players/{}/entries?lbids={}'.format(user.steam_id, matches)).read()
 	cont = json.loads(response.decode('utf-8'))
 	
 	string = ''
