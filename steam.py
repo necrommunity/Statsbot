@@ -131,7 +131,7 @@ def get_stats(user):
 			if char == 'Aria':
 				extra = ' ({} low%)'.format(d['Aria low'])
 			if char == 'Cadence':
-				extra = ' ({} sub-15{} no-r)'.format(d['Cadence speed'], d['NR'])
+				extra = ' ({} sub-15, {} no-r)'.format(d['Cadence speed'], d['NR'])
 			if char == 'Nocturna':
 				extra += ' ({} sub-15, {} hard)'.format(d['Nocturna speed'], d['HM'])
 			string += '   {}{}{}{}\n'.format(category.pad(char, 9), ' '*(5-dig(d[char])) ,d[char], extra)

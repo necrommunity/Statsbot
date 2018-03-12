@@ -43,9 +43,10 @@ def fill_user(steam_id):
 
 
 def entries(user, matches):
-
-	lbs = ','.join(matches)
-	response = urllib.request.urlopen('https://api.toofz.com/players/{}/entries?lbids={}'.format(user.steam_id, matches)).read()
+	lbs = ''
+	for m in matches:
+		lbs += '{},'.format(m.lbid)
+	response = urllib.request.urlopen('https://api.toofz.com/players/{}/entries?lbids={}'.format(user.steam_id, lbs[:-1])).read()
 	cont = json.loads(response.decode('utf-8'))
 	
 	string = ''
