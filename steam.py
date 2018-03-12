@@ -120,7 +120,7 @@ def get_stats(user):
 	string = ''
 	string += 'Playtime: {} hours ({} recently)\n\n'.format(int(time_ever/60), round(time_2weeks/60, 3))
 	string += 'Deaths: {} ({} per hour)\n'.format(d['Deaths'], round(int(d['Deaths']) / (time_ever/60), 5))
-	string += 'Green bats: {}\n\n'.format(d['GreenBats'])
+	string += 'Green bats: {} ({} per hour)\n\n'.format(d['GreenBats'], round(int(d['GreenBats']) / (time_ever/60), 5))
 	string += 'Clears count\n'
 
 	for char in category.characters:
