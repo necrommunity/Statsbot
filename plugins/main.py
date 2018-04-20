@@ -261,10 +261,10 @@ class MainPlugin(Plugin):
 			return
 
 		results = steam.get_stats(steam_user)
-		if not results:
-			embed.title = 'Failed to retrieve stats for {} (profile is likely private).'.format(steam_user.name)
-			event.channel.send_message('', embed=embed)
-			return
+		# if not results:
+		# 	embed.title = 'Failed to retrieve stats for {} (profile is likely private).'.format(steam_user.name)
+		# 	event.channel.send_message('', embed=embed)
+		# 	return
 		
 		if alt:
 			event.channel.send_message('```{} #{}\n\n{}```'.format(steam_user.name, steam_user.steam_id, results))

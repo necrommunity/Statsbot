@@ -93,9 +93,12 @@ def get_players(ids):
 def get_stats(user):
 	try:
 		response = urllib.request.urlopen('http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?key={}&appid=247080&steamid={}'.format(steamkey, user.steam_id)).read()
-		cont = json.loads(response.decode('utf-8'))
-		stats = cont['playerstats']['stats']
+	except:
+		return 'Failed to retrieve game stats for {}.\n(profile is likely private, please refer to the pins).'.format(user.name)
+	cont = json.loads(response.decode('utf-8'))
+	stats = cont['playerstats']['stats']
 
+	try:
 		response = urllib.request.urlopen('http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={}&steamid={}'.format(steamkey, user.steam_id)).read()
 		cont = json.loads(response.decode('utf-8'))
 		for game in cont['response']['games']:
@@ -106,7 +109,9 @@ def get_stats(user):
 				except:
 					time_2weeks = 0
 	except:
-		return False
+		time_ever = 0
+		time_2weeks = 0
+	
 	
 	d = {}
 	for s in stats:
