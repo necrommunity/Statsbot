@@ -109,8 +109,8 @@ def get_stats(user):
 				except:
 					time_2weeks = 0
 	except:
-		time_ever = 0
-		time_2weeks = 0
+		time_ever = 60
+		time_2weeks = 60
 	
 	
 	d = {}
