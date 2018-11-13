@@ -10,35 +10,32 @@ Discord bot created for the CoNDOR server. Fetches and formats Crypt of the Necr
 
 ### Synopsis
 
-`.search "steamname"
-
+```
+.search "steamname"
 .speed "steamname"
-
 .speed #steamID
-
 .leaderboard "character"
-
 .stats "steamid"
-
-.stats #steamID`
+.stats #steamID
+```
 
 
 ### Name search
 Displays a list of players with a matching name, ordered by entry count.
 
-`.search "steamname"
-
-.s "steamname"`
-
+```
+.search "steamname"
+.s "steamname"
+```
 
 ### Player results
 Displays the player's personal bests in the specified category.
 
-`.speed "steamname"
-
+```
+.speed "steamname"
 .score #steamID
-
-.[category] "steamname" [product] [mode]`
+.[category] "steamname" [product] [mode]
+```
 
 `steamname`: Name searched. The results displayed are of the player with the most entries.
 
@@ -52,11 +49,11 @@ Displays the player's personal bests in the specified category.
 ### Leaderboards
 Displays the specified leaderboard.
 
-`.leaderboard "character"
-
+```
+.leaderboard "character"
 .lb "character"
-
-.leaderboard [character] [product] [category] -[offset]`
+.leaderboard [character] [product] [category] -[offset]
+```
 
 `charcter`: The character type of the leaderboard. (All, Aria, Bard, Bolt, Cadence, Coda, Diamond, Dorian, Dove, Eli, Melody, Monk, Nocturna, Story)
 
@@ -68,21 +65,20 @@ Displays the specified leaderboard.
 ### Records
 Displays various misc steam statistics. *Requires the user profile to be public.*
 
-`.records "steamname"
-
+```
+.records "steamname"
 .records #steamID`
-
 `name/SteamID` is the same as search.
-
+```
 
 ### Necrobot (no longer in use)
 Displayed a user's past necrobot races.
 
-`.necrobot "user"
-
+```
+.necrobot "user"
 .races "user"
-
-.necrobot "user" -[offset]`
+.necrobot "user" -[offset]
+```
 
 `name`: The discord user to search. By default the command will return the user's results.
 
