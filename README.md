@@ -48,6 +48,7 @@ Displays the player's personal bests in the specified category.
 `mode`: Run's game mode, standard by default. (standard, hardmode, noreturn, low%)
 
 
+
 ### Leaderboards
 Displays the specified leaderboard.
 
@@ -70,8 +71,6 @@ Displays various misc steam statistics. *Requires the user profile to be public.
 ```
 .stats "steamname"
 .stats #steamID`
-`name/SteamID` is the same as search.
-```
 
 ### Necrobot (no longer in use)
 Displayed a user's past necrobot races.
