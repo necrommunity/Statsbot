@@ -6,37 +6,8 @@ import category
 with open('key.conf') as f:
 	steamkey = f.read()
 
-statsnames = {
-	"NumGreenBatKills": "GreenBats",
-	"NumDeaths": "Deaths",
-	"NumHardcoreCompletionsCadence": "Cadence",
-	"NumHardcoreCompletionsAria": "Aria",
-	"NumHardcoreCompletionsBard": "Bard",
-	"NumHardcoreCompletionsBolt": "Bolt",
-	"NumHardcoreCompletionsMonk": "Monk",
-	"NumDailyChallengeCompletions": "Dailies",
-	"NumSub8CadenceSpeedruns": "Cadence speed",
-	"NumAriaLowPercentCompletions": "Aria low",
-	"NumHardcoreCompletionsDove": "Dove",
-	"NumHardcoreCompletionsEli": "Eli",
-	"NumHardcoreCompletionsMelody": "Melody",	
-	"NumHardcoreCompletionsDorian": "Dorian",
-	"NumHardcoreCompletionsCoda": "Coda",
-	"NumAllCharsCompletions": "All Chars",
-	"NumAllCharsLowPercentCompletions": "All low",
-	"NumHardcoreCompletionsNocturna": "Nocturna",
-	"NumHardcoreCompletionsDiagonal": "Diamond",
-	"NumHardcoreCompletionsReaper": "Mary",
-	"NumHardcoreCompletionsTempo": "Tempo",
-	"NumNoReturnCompletionsCadence": "NR",
-	"NumHardModeCompletionsNocturna": "HM",
-	"NumSub10NocturnaSpeedruns": "Nocturna speed",
-	"NumStoryModeCompletions": "Story",
-	"NumPhasingModeCompletions": "Phasing",
-	"NumRandomizerModeCompletions": "Rando",
-	"NumMysteryModeCompletions": "Mystery",
-	"NumAllCharsDLCCompletions": "All Chars DLC",
-}
+with open('steam_stats.json') as f:
+	statsnames = json.loads(f.read())
 
 
 def parse_index():
@@ -78,6 +49,18 @@ def fetch_lb(lb, offset=1):
 	return string
 
 
+def fill_user(steam_id):
+	url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={}&steamids={}'
+	response = urllib.request.urlopen(url.format(steamkey, steam_id)).read()
+	cont = json.loads(response.decode('utf-8'))
+	try:
+		player = cont['response']['players'][0]
+		steam_user = user(player['steamid'], player['personaname'], player['avatarmedium'])
+		return steam_user
+	except:
+		return None
+
+
 def get_players(ids):
 	joint = ','.join(ids)
 	url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={}&steamids={}'.format(steamkey, joint)
@@ -89,60 +72,82 @@ def get_players(ids):
 		d[item['steamid']] = item['personaname']
 	return d
 
-
-def get_stats(user):
+def fetch_player_stats(user):
 	try:
 		response = urllib.request.urlopen('http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?key={}&appid=247080&steamid={}'.format(steamkey, user.steam_id)).read()
 	except:
-		return 'Failed to retrieve game stats for {}.\n(profile is likely private, please refer to the pins).'.format(user.name)
+		return False
+	
 	cont = json.loads(response.decode('utf-8'))
-	stats = cont['playerstats']['stats']
-	time_ever = 1
-	time_2weeks = 1
+	raw_stats = cont['playerstats']['stats']
+
+	player_stats = { statsnames[s['name']]: int(s['value']) for s in raw_stats}
+	for name in statsnames.values():
+		if name not in player_stats:
+			player_stats[name] = 0
+
+
+	# playtime
 	try:
 		response = urllib.request.urlopen('http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={}&steamid={}'.format(steamkey, user.steam_id)).read()
 		cont = json.loads(response.decode('utf-8'))
 		for game in cont['response']['games']:
 			if game['appid'] == 247080:
-				time_ever = int(game['playtime_forever'])
+				player_stats['time_ever'] = int(game['playtime_forever'])
 				try:
-					time_2weeks = int(game['playtime_2weeks'])
+					player_stats['time_2weeks'] = int(game['playtime_2weeks'])
 				except:
-					pass
+					player_stats['time_2weeks'] = 0
 	except:
-		pass
+		player_stats['time_ever'] = 0
+		player_stats['time_2weeks'] = 0
+
+	return player_stats
+
+def get_stats(user):
 	
-	
-	d = {}
-	for s in stats:
-		if statsnames.get(s['name']):
-			d[statsnames[s['name']]] = int(s['value'])
-	
-	for s in statsnames.values():
-		if not d.get(s):
-			d[s] = 0
+	p_stats = fetch_player_stats(user)
+	if not p_stats:
+		return 'Failed to retrieve stats for {}. Please make sure "Game details" under steam profile privacy settings is set to "public"'.format(user.name)
 
 	string = ''
-	string += 'Playtime: {} hours ({} recently)\n\n'.format(int(time_ever/60), round(time_2weeks/60, 3))
-	string += 'Deaths: {} ({} per hour)\n'.format(d['Deaths'], round(int(d['Deaths']) / (time_ever/60), 5))
-	string += 'Green bats: {} ({} per hour)\n\n'.format(d['GreenBats'], round(int(d['GreenBats']) / (time_ever/60), 5))
-	string += 'Clears count\n'
+	if (p_stats['time_ever']):
+		string += 'Playtime: {} hours ({} recently)\n\n'.format(int(p_stats['time_ever']/60), round(p_stats['time_2weeks']/60, 3))
+		string += 'Deaths: {} ({} per hour)\n'.format(p_stats['Deaths'], round(p_stats['Deaths'] / (p_stats['time_ever']/60), 5))
+	else:
+		string += 'Deaths: {}\n'.format(p_stats['Deaths'])
 
+	string += 'Green bats: {}\n\n'.format(p_stats['Green Bats'])
+	
+	string += 'Clears count\n'
+	for char in category.characters:
+		if p_stats[char] != 0:
+			string += '   {}{}{}\n'.format(category.pad(char, 10), ' '*(5-dig(p_stats[char])) ,p_stats[char])
+
+	return string
+
+def get_misc(user):
+	
+	player_stats = fetch_player_stats(user)
+	if not user_stats:
+		return 'Failed to retrieve stats for {}. Please make sure "Game details" under steam profile privacy settings is set to "public"'.format(user.name)
+		
+	string = ''
+	if (time_ever):
+		string += 'Playtime: {} hours ({} recently)\n\n'.format(int(time_ever/60), round(time_2weeks/60, 3))
+		string += 'Deaths: {} ({} per hour)\n'.format(d['Deaths'], round(int(d['Deaths']) / (time_ever/60), 5))
+	else:
+		string += 'Deaths: {}\n'.format(d['Deaths'])
+
+	string += 'Green bats: {}\n\n'.format(d['GreenBats'])
+	
+	string += 'Clears count\n'
 	for char in category.characters:
 		if d[char] != 0:
-			extra = ''
-			if char == 'All Chars':
-				extra = ' ({} low%)'.format(d['All low'])
-			if char == 'Aria':
-				extra = ' ({} low%)'.format(d['Aria low'])
-			if char == 'Cadence':
-				extra = ' ({} sub-15, {} no-r)'.format(d['Cadence speed'], d['NR'])
-			if char == 'Nocturna':
-				extra += ' ({} sub-15, {} hard)'.format(d['Nocturna speed'], d['HM'])
-			string += '   {}{}{}{}\n'.format(category.pad(char, 9), ' '*(5-dig(d[char])) ,d[char], extra)
-	for e in ['Dailies', 'Phasing', 'Rando', 'Mystery']:
-		if d[e] != 0:		
-			string += '   {}{}{}\n'.format(category.pad(e, 9), ' '*(5-dig(d[e])) ,d[e])
+			string += '   {}{}{}\n'.format(category.pad(char, 10), ' '*(5-dig(d[char])) ,d[char])
+	# for e in ['Dailies', 'Phasing', 'Rando', 'Mystery']:
+	# 	if d[e] != 0:		
+	# 		string += '   {}{}{}\n'.format(category.pad(e, 9), ' '*(5-dig(d[e])) ,d[e])
 
 	return string
 	
@@ -153,5 +158,6 @@ class user:
 		self.name = name
 		self.avatar = avatar
 		self.updated = updated
+
 
 

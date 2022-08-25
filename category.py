@@ -1,10 +1,11 @@
 import steam
 
 characters = ['All Chars DLC', 'All Chars', 'Story', 'Aria', 'Bard', 'Bolt',
-				'Cadence', 'Coda', 'Diamond', 'Dorian', 'Dove', 'Eli',
-				'Mary', 'Melody', 'Monk', 'Nocturna', 'Tempo']
+				'Cadence', 'Chaunter', 'Coda', 'Diamond', 'Dorian', 'Dove',
+				'Eli', 'Klarinetta', 'Mary', 'Melody', 'Monk',
+				'Nocturna', 'Suzu', 'Tempo']
 run_type = ['Speed', 'Score', 'Deathless']
-extras = ['No Return', 'Hard', 'Phasing', 'Mystery', 'Randomizer']
+extras = ['No Return', 'Hard', 'Phasing', 'Mystery', 'Randomizer', 'Low%']
 version = ['Amplified', 'Classic']
 
 
@@ -116,6 +117,9 @@ def extract_extra(q):
 				return e
 		elif caseless_in(e, q):
 			return e
+		elif e == "Low%":
+			if caseless_in('low', q):
+				return e
 	return 'Standard'
 
 

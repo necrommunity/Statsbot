@@ -1,4 +1,5 @@
 import toofz, steam, category
+import pandas as pd
 
 from urllib.parse import quote
 from disco.bot import Plugin
@@ -39,7 +40,7 @@ class MainPlugin(Plugin):
 	def on_version(self, event):
 		embed = MessageEmbed()
 		embed.color = ecolor
-		embed.title = 'Statsbot v0.93. Use `.help` for more info.'
+		embed.title = 'Statsbot v0.97. Use `.help` for more info.'
 		event.channel.send_message('', embed=embed)
 
 
@@ -53,17 +54,15 @@ class MainPlugin(Plugin):
 		if args == '':
 			embed.title = 'Statsbot is a bot which retrieves Crypt of the Necrodancer player stats'
 			embed.description = '''\nAvailable commands:
-								\n`.search`, `.speed`, `.score`, `.deathless`, `.leaderboard`, `.stats`.
+								\n`.search`, `.stats`, `.pb`, `.leaderboard, ``.speed`, `.score`, `.deathless`.
 								\nUse `.help command` for more info about a particular command.
 								\n\n**Frequently asked questions:**
 								\n**Q: I can't find myself!**
-								\nA: Search using your steam name. If you recently changed it, there might be a while before the bot is updated.
+								\nA: Search using your steam name. It might be a bit before the name changes are reflected.
 								\n**Q: Why does someone else with my nickname shows up?**
 								\nA: The player brought up is the one with the most records across all the leaderboards. Until it's you, use the command with your steam ID instead of nickname (`.speed #12345678`). If you don't know what your ID is, use `.search <your nick here>` to find out.
-								\n**Q: Is it possible to see my stats for iOS or switch versions?**
-								\nA: Unfortunately there's no way I'm aware of to access that info as of now, all the information presented by the bot comes from steam and Toofz (Mendayen's site).
 								\n**Q: Who are you?**
-								\nA: I'm Statsbot. beep boop. But nah I'm Naymin, feel free to PM me here or on twitter (naymin_nd).'''
+								\nA: I'm Statsbot. beep boop. But nah I'm Naymin, feel free to PM me here or on twitter (nayminyeah).'''
 			event.channel.send_message('', embed=embed)
 			return
 		if 'search' in args:
@@ -72,16 +71,16 @@ class MainPlugin(Plugin):
 			event.channel.send_message('', embed=embed)
 			return
 		if 'speed' in args or 'score' in args or 'deathless' in args:
-			embed.title = "Display player's personal bests in a specific category"
+			embed.title = "Display player's personal bests in a specific category as featured in crypt.toofz.com"
 			embed.description = '''Use `.speed`, `.score` or`.deathless` `name`.
 								\nAdd `seeded`, `classic`, `hardmode`, `mystery` etc to filter the results.
 								\nSteamID can be used instead of a name by prefixing it with a `#`.'''
 			event.channel.send_message('', embed=embed)
 			return
 		if args == 'leaderboard':
-			embed.title = "Display an in-game leaderboard"
+			embed.title = "Display an in-game leaderboard from steam's community boards (no 3.0 boards!)"
 			embed.description = '''Use `.leaderboard` `character` `category`.
-								\nAdd `seeded`, `classic`, `hardmode`, `mystery` etc to filter the results.
+								\nAdd `seeded`, `classic`, `hardmode`, `mystery`, `low` to filter the results.
 								\nAdjust entries offset by adding `-number`.'''
 			event.channel.send_message('', embed=embed)
 			return
@@ -90,6 +89,9 @@ class MainPlugin(Plugin):
 			embed.description = 'Use `.stats` `name`.'
 			event.channel.send_message('', embed=embed)
 			return
+		if args == 'pb':
+			embed.title = "Display player's personal best in default all-zones mode, fetched from warachia's site."
+			embed.description = 'Use `.pb` `name`.'
 		
 
 
@@ -185,6 +187,7 @@ class MainPlugin(Plugin):
 
 
 	@Plugin.command('leaderboard', '[args:str...]')
+	Plugin.command('leaderboards', '[args:str...]')
 	@Plugin.command('lb', '[args:str...]')
 	def on_leaderboard(self, event, args =''):
 
@@ -208,7 +211,7 @@ class MainPlugin(Plugin):
 
 		target = self.index.get_certain_board(quote(args))
 		if not target:
-			embed.title = 'No leaderboards found. Is this a valid category?'
+			embed.title = 'No such leaderboards found. Category might not be public.'
 			event.channel.send_message('', embed=embed)
 			return
 
@@ -251,7 +254,7 @@ class MainPlugin(Plugin):
 
 		if user[0] == '#':
 			user = user[1:]
-			steam_user = toofz.fill_user(user)
+			steam_user = steam.fill_user(user)
 		else:
 			steam_user = toofz.get_top(quote(user))
 
@@ -262,7 +265,7 @@ class MainPlugin(Plugin):
 
 		results = steam.get_stats(steam_user)
 		# if not results:
-		# 	embed.title = 'Failed to retrieve stats for {} (profile is likely private).'.format(steam_user.name)
+		# 	embed.title = 'Failed to retrieve stats for {}. Please make sure "Game details" under steam profile privacy settings is set to "public"'.format(steam_user.name)
 		# 	event.channel.send_message('', embed=embed)
 		# 	return
 		
@@ -273,11 +276,40 @@ class MainPlugin(Plugin):
 		embed.title = "{} #{}".format(steam_user.name, steam_user.steam_id)
 		embed.set_footer(icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/master/icons/steam.png')
 		embed.set_thumbnail(url=steam_user.avatar)
-		embed.add_field(name='-', value='`{}`'.format(results))
+		embed.add_field(name='Clear Count', value='`{}`'.format(results))
 
 		event.channel.send_message('', embed=embed)
 
-	
-	# @Plugin.listen('MessageCreate')
-	# def on_message_create(self, event):
-	# 	msg = event.message
+
+	@Plugin.command('pb', '[args:str...]')
+	@Plugin.command('pbs', '[args:str...]')
+	def on_pb(self, event, args=''):
+
+		embed = MessageEmbed()
+		embed.color = ecolor
+
+		try:
+			user = event.member.name
+		except:
+			user = event.author.username
+
+		if args != '':
+			user = args.split()[0]
+			args = args[len(user)+1:]
+
+		df = []
+		try:
+			df = pd.read_html('https://warachia2.github.io/NecroRankings/pbs/{}.html'.format(user), header=0, index_col=1)[0]
+		except:
+			embed.title = 'No page found for "{}". Make sure the name is capitalised correctly.'.format(user)
+			event.channel.send_message('', embed=embed)
+			return
+		
+		df.dropna(axis=1, inplace=True)
+		df.columns = ['Speed', '', 'Score', '']
+		
+		embed.title = "{} PBs".format(user)
+		embed.set_footer(text='https://warachia2.github.io/NecroRankings', icon_url='https://avatars.githubusercontent.com/u/70665936?v=4')
+		embed.add_field(name='-', value='`{}`'.format(df.to_string()))
+
+		event.channel.send_message('', embed=embed)
