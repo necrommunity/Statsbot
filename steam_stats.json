@@ -1,4 +1,5 @@
-{"NumGreenBatKills": "Green Bats",
+{
+	"NumGreenBatKills": "Green Bats",
 	"NumDeaths": "Deaths",
 	"NumShopkeeperKills": "Shopkeep Kills",
 	"MaxHeartContainers": "Max Hearts",
@@ -44,7 +45,7 @@
 	"NumMysteryModeCompletions": "Mystery",
 	"NumAllCharsDLCCompletions": "All Chars DLC",
 	"NumNoReturnCompletions": "No-Return",
-	"NumNoReturnCompletions": "Hardmode",
+	"NumHardModeCompletions": "Hardmode",
 	"HardcoreCompletionsKlarinetta": "Klarinetta",
 	"HardcoreCompletionsChaunter": "Chaunter",
 	"HardcoreCompletionsSuzu": "Suzu",
