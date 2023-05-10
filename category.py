@@ -1,9 +1,9 @@
 import steam
 
-characters = ['All Chars DLC', 'All Chars', 'Story', 'Aria', 'Bard', 'Bolt',
-				'Cadence', 'Chaunter', 'Coda', 'Diamond', 'Dorian', 'Dove',
-				'Eli', 'Klarinetta', 'Mary', 'Melody', 'Monk',
-				'Nocturna', 'Suzu', 'Tempo']
+characters = ['All Chars DLC', 'All Chars', 'Story', 'Ensemble',
+				'Aria', 'Bard', 'Bolt', 'Cadence', 'Chaunter', 'Coda',
+				'Diamond', 'Dorian', 'Dove', 'Eli', 'Klarinetta',
+				'Mary', 'Melody', 'Monk', 'Nocturna', 'Reaper', 'Suzu', 'Tempo']
 run_type = ['Speed', 'Score', 'Deathless']
 extras = ['No Return', 'Hard', 'Phasing', 'Mystery', 'Randomizer', 'Low%']
 version = ['Amplified', 'Classic']

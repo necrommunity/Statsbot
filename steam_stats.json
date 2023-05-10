@@ -53,5 +53,14 @@
 	"NumSameEntityPossessionKills": "Same Kill",
 	"Sub10SuzuSpeedruns": "Suzu Speed",
 	"NoBeatCompletionsAria": "No-beat Aria",
-	"NumEnPassantCaptures": "En Passant'ed"
+	"NumEnPassantCaptures": "En Passant'ed",
+	"NumHardcoreCompletionsActuallyReaper" : "Reaper",
+	"DoubleTempoCompletionsBolt": "Boltolt",
+	"MaxEquippedItemSlots": "Maximum Slots",
+	"CoopCompletionsFamily": "Co-op Family",
+	"NumDeepBluesDirectKingKills": "DB Direct",
+	"NumDeadRingerReflectKills": "DR Reflect",
+	"NumUrnsPossessed": "Urns Possesed",
+	"NumPawnbrokerSpecialOffers": "Pawnbroker Special",
+	"EnsembleCompletions": "Ensemble"
 }

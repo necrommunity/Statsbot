@@ -16,7 +16,7 @@ import time
 intents = discord.Intents.default()
 
 desc = 'wip dont mind me'
-bot = commands.Bot(command_prefix='?', description=desc, intents=intents, help_command=None)
+bot = commands.Bot(command_prefix='.', case_insensitive=True, description=desc, intents=intents, help_command=None)
 
 
 ecolor = 0x00AD96
@@ -44,7 +44,7 @@ async def on_ready():
 
 @bot.command(aliases = ['ver'])
 async def version(ctx):
-    reply = Embed(colour=ecolor, title='Statsbot v2.0. Use `.help` for more info.')
+    reply = Embed(colour=ecolor, title='Statsbot v2.1.1. Use `.help` for more info.')
     await ctx.send(embed=reply)
 
 @bot.command()
@@ -193,10 +193,7 @@ async def stats(ctx, *args):
     if alt:
         args = args.replace('-alt', '').strip()
 
-    if ctx.author.nick:
-        user = ctx.author.nick
-    else:
-        user = ctx.author.name
+    user = ctx.author.display_name
 
     if args != '':
         user = args.split()[0]
@@ -237,11 +234,8 @@ async def pbs(ctx, *args):
 
     embed = Embed(colour=ecolor)
 
-    if ctx.author.nick:
-        user = ctx.author.nick
-    else:
-        user = ctx.author.name
-
+    user = ctx.author.display_name
+        
     if args != '':
         user = args.strip()
     try:
@@ -277,7 +271,7 @@ async def _bot(ctx):
 
 
 
-with open('alt_token.json') as f:
+with open('config.json') as f:
 	content = json.loads(f.read())
 	token = content['token']
 
