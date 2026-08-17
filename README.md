@@ -1,99 +1,14 @@
-# Statsbot
+# Statsbot v3.0
 Discord bot created for the CoNDOR server. Fetches and formats Crypt of the Necrodancer stats.
 
 
 ## Features
-- Search - information regarding a player's personal bests using Mendayen's api (http://api.toofz.com/help).
-- Leaderboard - supports all leaderboards as fetched from the steam api.
-- Stats - various misc stats such as playtime, deaths, characters clears count, and other misc records.
-- ~~Necrobot - returns results of Incnone's necrobot races from the community database.~~ necrobot does it natively now!
-- pbs - player's personal bests from Warachia's site (https://warachia2.github.io/NecroRankings/).
+Uses slash commands now!
+- Leaderboard - supports all in-game leaderboards.
+- Stats - various miscellaneous stats tracked by steam such as playtime, deaths, characters clears count, and others.
 
-### Synopsis
-
-```
-.search "steamname"
-.speed "steamname"
-.speed #steamID
-.leaderboard "character"
-.stats "steamid"
-.stats #steamID
-.pb steamname
-```
-
-
-### Name search
-Displays a list of players with a matching name, ordered by entry count.
-
-```
-.search "steamname"
-.s "steamname"
-```
-
-### Player results
-Displays the player's personal bests in the specified category.
-
-```
-.speed "steamname"
-.score #steamID
-.[category] "steamname" [product] [mode]
-```
-
-`steamname`: Name searched. The results displayed are of the player with the most entries.
-
-`steamID`: Can be used instead of a name. An argument will be treated as an ID if it begins with '#'.
-
-`product`: By default the results are Amplified only. Adding "classic" as a product will return classic results.
-
-`mode`: Run's game mode, standard by default. (standard, hardmode, noreturn, low%)
-
-
-
-### Leaderboards
-Displays the specified leaderboard.
-
-```
-.leaderboard "character"
-.lb "character"
-.leaderboard [character] [product] [category] -[offset]
-```
-
-`charcter`: The character type of the leaderboard. (All, Aria, Bard, Bolt, Cadence, Coda, Diamond, Dorian, Dove, Eli, Melody, Monk, Nocturna, Story)
-
-`product`, `category` are the same as search.
-
-`offset`: Changes the range of the displayed entries. The offset is 0 by default.
-
-
-### Stats
-Displays various misc steam statistics. *Requires the user profile to be public.*
-
-```
-.stats "steamname"
-.stats #steamID`
-
-### Necrobot (no longer in use)
-Displayed a user's past necrobot races.
-
-```
-.necrobot "user"
-.races "user"
-.necrobot "user" -[offset]
-```
-
-`name`: The discord user to search. By default the command will return the user's results.
-
-`offset` is the same as leaderboards display.
-
-
-### Help
-Displays the help information and a list of commands.
-
-`.help [command]`
-
-`command`: The command to expand on.
-
-### Version
-Displays the bot's current version.
-
-`.version`
+## History
+This is the third (give or take) rewrite of the project since the launch in 2017. Past versions include
+- C# implementation based on Toofz API. Discord library stopped supporting unix-based compilation.
+- Python rewrite using text-based commands, still based on Toofz API. Historically supported the most features (Toofz: username search and personal bests, Steam: leaderboards and miscellaneous stats, Necrobot (racing results): database access, Warachia: alternate source of personal bests). Changed discord library at some point after it was deprecated.
+- Current version - a few years back, Toofz went offline and with it, the user search function and ability to fetch personal bests. Additionally, with the release of Necrodancer: Synchrony, the Steam leaderboards were deprecated in favour of a more sustainable service. The bot was on life support for a few years until Discord forced my hand by removing message content (text-based commands) privileges. With Necrodancer's developers' permission, service access (thanks Maru!), and an additional node client, username search and leaderboard functionalities are now available and can be used with slash commands.
