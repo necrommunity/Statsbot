@@ -1,280 +1,199 @@
 
 
+import braincloud as bc
+import category
+
+from typing import Literal, Optional
+
 import discord
-from discord.ext import commands
+from discord import app_commands
 from discord.embeds import Embed
 
+import steam
 import json
-from urllib.parse import quote
-
-import toofz, steam, category
-import pandas as pd
-import time
-
-
-
-intents = discord.Intents.default()
-
-desc = 'wip dont mind me'
-bot = commands.Bot(command_prefix='.', case_insensitive=True, description=desc, intents=intents, help_command=None)
 
 
 ecolor = 0x00AD96
 
+MY_GUILD = discord.Object(id=250565294274117643)
+
+class Client(discord.Client):
+    # Suppress error on the User attribute being None since it fills up later
+    #user: discord.ClientUser
+
+    def __init__(self, *, intents: discord.Intents):
+        super().__init__(intents=intents)
+        self.tree = app_commands.CommandTree(self)
+    
+    # In this basic example, we just synchronize the app commands to one guild.
+    # Instead of specifying a guild to every command, we copy over our global commands instead.
+    # By doing so, we don't have to wait up to an hour until they are shown to the end-user.
+    async def setup_hook(self):
+        # This copies the global commands over to your guild.
+        self.tree.copy_global_to(guild=MY_GUILD)
+        await self.tree.sync(guild=MY_GUILD)
 
 
 
-def run_name(run, seeded):
-	if seeded:
-		return 'Seeded {}'.format(run)
-	return run
+
+intents = discord.Intents.default()
+client = Client(intents=intents)
 
 
-def check_alt(args):
-	if category.caseless_in('-alt', args):
-		return True
-	return False
-
-
-@bot.event
+@client.event
 async def on_ready():
-    print(f'Logged in as {bot.user} (ID: {bot.user.id})')
+    assert client.user is not None
+    print(f'Logged in as {client.user} (ID: {client.user.id})')
     print('------')
 
 
-@bot.command(aliases = ['ver'])
-async def version(ctx):
-    reply = Embed(colour=ecolor, title='Statsbot v2.1.1. Use `.help` for more info.')
-    await ctx.send(embed=reply)
-
-@bot.command()
-async def help(ctx, *args):
-    args = ' '.join(args)
-    args = args.lower()
-
-    embed = Embed(colour=ecolor)
-
-    # clean that up, possibly use discord-py group feature instead of manual parse
-    if args == '':
-        embed.title = 'Statsbot is a bot which retrieves Crypt of the Necrodancer player stats'
-        embed.description = '''\nAvailable commands:
-                            \n`.search`, `.speed`, `.score`, `.deathless`, `.leaderboard`, `.stats`, `pb`.
-                            \nUse `.help command` for more info about a particular command.
-                            \n\n**Frequently asked questions:**
-                            \n**Q: I can't find myself!**
-                            \nA: Search using your steam name. If you recently changed it, there might be a while before the bot is updated.
-                            \n**Q: Why does someone else with my nickname shows up?**
-                            \nA: The player brought up is the one with the most records across all the leaderboards. Until it's you, use the command with your steam ID instead of nickname (`.speed #12345678`). If you don't know what your ID is, use `.search <your nick here>` to find out.
-                            \n**Q: Is it possible to see my stats for iOS or switch versions?**
-                            \nA: Unfortunately there's no way I'm aware of to access that info as of now, all the information presented by the bot comes from steam and Toofz (Mendayen's site).
-                            \n**Q: Who are you?**
-                            \nA: I'm Statsbot. beep boop. But nah I'm Naymin, feel free to PM me here or on twitter (@nayminyeah).'''
-        await ctx.send(embed=embed)
-        return
-    if 'search' in args:
-        embed.title = 'Search for players and their steam IDs'
-        embed.description = 'Use `.search` `name` to see a list of results.'
-        await ctx.send(embed=embed)
-        return
-    if 'speed' in args or 'score' in args or 'deathless' in args:
-        embed.title = "Display player's personal bests in a specific category as featured in crypt.toofz.com"
-        embed.description = '''Use `.speed`, `.score` or`.deathless` `name`.
-                            \nAdd `seeded`, `classic`, `hardmode`, `mystery` etc to filter the results.
-                            \nSteamID can be used instead of a name by prefixing it with a `#`.'''
-        await ctx.send(embed=embed)
-        return
-    if args == 'leaderboard' or args == 'lb':
-        embed.title = "Display an in-game leaderboard"
-        embed.description = '''Use `.leaderboard` `character` `category`.
-                            \nAdd `seeded`, `classic`, `hardmode`, `mystery` etc to filter the results.
-                            \nAdjust entries offset by adding `-number`.'''
-        await ctx.send(embed=embed)
-        return
-    if args == 'stats':
-        embed.title = "Display misc statistics recorded by steam"
-        embed.description = 'Use `.stats` `name`.'
-        await ctx.send(embed=embed)
-        return
-    if args == 'pb' or args == 'pbs':
-        embed.title = "Display player's personal best in default all-zones mode, fetched from warachia's site."
-        embed.description = 'Use `.pb` `name`.'
-        await ctx.send(embed=embed)
-    # add default case lol
+@client.tree.command(description='Echos bot version.')
+async def version(interaction: discord.Interaction):
+    reply = Embed(colour=ecolor, title='This is Statsbot v3.0! We do slash commands now. Use `/help` for more info.')
+    await interaction.response.send_message(embed=reply)
 
 
-@bot.command()
-async def search(ctx, *args):
-    args = ' '.join(args)
-    args = args.lower()
+# @client.tree.command()
+# @app_commands.describe(
+#     first_value='The first value you want to add something to',
+#     second_value='The value you want to add to the first value',
+# )
+# async def add(interaction: discord.Interaction, first_value: int, second_value: int):
+#     """Adds two numbers together."""
+#     await interaction.response.send_message(f'{first_value} + {second_value} = {first_value + second_value}')
 
-    embed = Embed(colour=ecolor)
+@client.tree.command(description='Shows a selection of the user\'s Steam stats for Necrodancer.')
+@app_commands.describe(name='The display name of the user. Defaults to the server nickname of the user.',
+                       steamid='Alternatively, steamid of the user.')
+async def stats(interaction: discord.Interaction, name: Optional[str], steamid: Optional[str]):
+    reply = Embed(colour=ecolor)
 
-    alt = check_alt(args)
-    if alt:
-        args = args.replace('-alt', '').strip()
-
-    if args == '':
-        embed.title = 'Please enter a name to search for.'
-        await ctx.send(embed=embed)
-        return
-
-    results = toofz.search(quote(args))
-    if results == '':
-        embed.title = 'No players found called "{}".'.format(args)
-        await ctx.send(embed=embed)
-        return
-
-    if alt:
-        await ctx.send(('```Displaying top player results for "{}":\n\n{}```'.format(args, results)))
-        return
-
-    embed.title = 'Displaying top player results for "{}":'.format(args)
-    embed.set_thumbnail(url='https://raw.githubusercontent.com/necrommunity/Statsbot/master/icons/search.png')
-    embed.add_field(name='-', value='`{}`'.format(results))
-
-    await ctx.send(embed=embed)
-
-
-@bot.command(aliases = ['lb', 'leaderboard'])
-async def leaderboards(ctx, *args):
-    args = ' '.join(args)
-    args = args.lower()
-
-    embed = Embed(colour=ecolor)
-
-    alt = check_alt(args)
-    if alt:
-        args = args.replace('-alt', '').strip()
-
-    offset = 1
-    for arg in args.split():
-        if arg[0] == '-' or arg[0] == '&':
-            try:
-                offset = int(arg[1:])
-                args = args.replace(arg, '')
-            except:
-                embed.title = 'Please enter a valid offset.'
-                await ctx.send(embed=embed)
-                return
-
-    target = index.get_certain_board(quote(args))
-    if not target:
-        embed.title = 'No such leaderboards found. Category might not be public.'
-        await ctx.send(embed=embed)
-        return
-
-
-    results = steam.fetch_lb(target, offset)
-    if results == '':
-        embed.title = 'No entries found for {} in the {} category ({}, {}).'.format(target.char, run_name(target.run, target.seeded), target.ver, target.extra)
-        await ctx.send(embed=embed)
-        return
-
-    if alt:
-        await ctx.send('```Displaying {} leaderboard for {} ({}, {})\n\n{}```'.format(run_name(target.run, target.seeded), target.char, target.ver, target.extra, results))
-        return
-
-    embed.title = 'Displaying {} leaderboard for {} ({}, {})'.format(run_name(target.run, target.seeded), target.char, target.ver, target.extra)
-    embed.set_footer(icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/master/icons/steam.png')
-    embed.set_thumbnail(url='https://raw.githubusercontent.com/necrommunity/Statsbot/master/icons/{}.png'.format(target.char).replace(' ','%20'))
-    embed.add_field(name='-', value='`{}`'.format(results))
-
-    await ctx.send(embed=embed)
-
-
-@bot.command(aliases = ['stat'])
-async def stats(ctx, *args):
-    args = ' '.join(args)
-    args = args.lower()
-
-    embed = Embed(colour=ecolor)
-
-    alt = check_alt(args)
-    if alt:
-        args = args.replace('-alt', '').strip()
-
-    user = ctx.author.display_name
-
-    if args != '':
-        user = args.split()[0]
-        args = args[len(user)+1:]
-
-    if user[0] == '#':
-        user = user[1:]
-        steam_user = steam.fill_user(user)
+    if not name:
+        name = interaction.user.display_name
+        
+    if steamid:
+        steam_user = steam.fill_user(steamid)
+        if not steam_user:
+            reply.title = 'Failed to retrieve profile for ID "{}".'.format(steamid)
+            await interaction.response.send_message(embed=reply)
+            return
     else:
-        steam_user = toofz.get_top(quote(user))
-
-    if not steam_user:
-        embed.title = 'No players found called "{}".'.format(user)
-        await ctx.send(embed=embed)
-        return
+        user = bc.search_users(name)
+        if not user:
+            reply.title = 'No players found called "{}".'.format(user)
+            await interaction.response.send_message(embed=reply)
+            return
+        steam_id = bc.get_steamid(user['profileId'])
+        steam_user = steam.User(steam_id, user['profileName'], avatar=user['pictureUrl'])
+        if not steam_id:
+            reply.title = 'No Steam profile found for user "{}".'.format(user['profileName'])
+            await interaction.response.send_message(embed=reply)
+            return
 
     results = steam.get_stats(steam_user)
-    # if not results:
-    #   embed.title = 'Failed to retrieve stats for {}. Please make sure "Game details" under steam profile privacy settings is set to "public"'.format(steam_user.name)
-    #   event.channel.send_message('', embed=embed)
-    #   return
-    
-    if alt:
-        await ctx.send('```{} #{}\n\n{}```'.format(steam_user.name, steam_user.steam_id, results))
+    if not results:
+        reply.add_field(name='Error', value='Failed to retrieve stats for {}. Please make sure "Game details" under steam profile privacy settings is set to "public"'.format(steam_user.name))
+        await interaction.response.send_message(embed=reply)
         return
 
-    embed.title = "{} #{}".format(steam_user.name, steam_user.steam_id)
-    embed.set_footer(icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/master/icons/steam.png')
-    embed.set_thumbnail(url=steam_user.avatar)
-    embed.add_field(name='Clear Count', value='`{}`'.format(results))
+    reply.title = "{} #{}".format(steam_user.name, steam_user.steam_id)
+    reply.set_footer(icon_url='https://raw.githubusercontent.com/necrommunity/Statsbot/master/icons/steam.png')
+    reply.set_thumbnail(url=steam_user.avatar)
+    # reply.add_field(name='Stats', value='`{}`'.format(results))
+    for field in ['Playtime', 'Deaths', 'Green bats', 'Approximate clears count']:
+        reply.add_field(name=field, value=results[field], inline=False)
+    await interaction.response.send_message(embed=reply)
 
-    await ctx.send(embed=embed)
 
-
-@bot.command(aliases = ['pb'])
-async def pbs(ctx, *args):
-    args = ' '.join(args)
-
-    embed = Embed(colour=ecolor)
-
-    user = ctx.author.display_name
+@client.tree.command(description='Fetches entries from the in-game leaderboards.')
+@app_commands.describe(char='In-game character.',
+                       ranking='Leaderboard type.',
+                       index='Shows results starting at offset.',
+                       dlc='Amplified DLC (defaults to True).',
+                       sync='Sync DLC (defaults to True).',
+                       seeded='Seeded runs (defaults to False).',
+                       modes_input=f'Subset of {category.mode_strs}.',
+                       players='Number of players, if applicable. Defaults to 1.')
+@app_commands.rename(char='character', ranking='category', index='offset',
+                     dlc='amp', players='number-of-players', modes_input='modes')
+async def leaderboard(interaction: discord.Interaction,
+                      char: category.char_names, 
+                      ranking: Literal['speed', 'score', 'score duping', 'deathless'],
+                      index: int = 0,
+                      dlc: bool = True,
+                      sync: bool = True,
+                      seeded: bool = False,
+                      modes_input: str = '',
+                      players: app_commands.Range[int, 1, 8] = 1):
+    reply = Embed(colour=ecolor)
+    
+    modes_input = modes_input.lower()
+    modes_found = set()
+    
+    if players > 5:
+        players = 8
+    
+    for i, m in enumerate([m.lower().replace('_', ' ') for m in category.mode_strs]):
+        if m in modes_input:
+            modes_found.add(category.mode_strs[i])
+    found_lb = None
+    for lb in all_lbs:
+        if (lb['char'] == char and lb['ranking'] == ranking and lb['dlc'] == dlc
+            and lb['sync'] == sync and lb['seeded'] == seeded and lb['players'] == players):
+            if (set(lb['modes']) == modes_found):
+                found_lb = category.Leaderboard(lb['lbid'])
+    if not found_lb:
+        reply.title = 'Did not find leaderboard. Is this a valid combination?'
+        await interaction.response.send_message(embed=reply)
+        return
+    # print(found_lb.lbid)
+    
+    entries = bc.fetch_lb(found_lb.lbid, index=index)
+    if not entries:
+        reply.title = 'Failed to fetch entries.'
+        await interaction.response.send_message(embed=reply)
+        return
         
-    if args != '':
-        user = args.strip()
-    try:
-        df = pd.read_html('https://warachia2.github.io/NecroRankings/pbs/{}.html'.format(user), header=0, index_col=1)[0]
-    except:
-        embed.title = 'No page found for "{}". Make sure the name is capitalised correctly.'.format(user)
-        await ctx.send(embed=embed)
-        return
+    rank_width = len(str(index+10))+1
+    score_width = len(str(entries[0]['score']))+4
+    lbstr = ''
+    for e in entries:
+        rank = f'{e["rank"]}.'.rjust(rank_width)
+        score = category.score_string(e["score"], found_lb).ljust(score_width)
+        player = e['name']
+        lbstr += '{}  {}  {}\n'.format(rank, score, player)
     
-    df.dropna(axis=1, inplace=True)
-    df.columns = ['Speed', '', 'Score', '']
+    flags = {'Amp':dlc, 'Sync':sync, 'seeded':seeded}
+    flags_str = []
+    for k, b in flags.items():
+        if b:
+            flags_str.append(k)
     
-    embed.title = "{} PBs".format(user)
-    embed.set_footer(text='https://warachia2.github.io/NecroRankings', icon_url='https://avatars.githubusercontent.com/u/70665936?v=4')
-    embed.add_field(name='-', value='`{}`'.format(df.to_string()))
-
-    await ctx.send(embed=embed)
-
-
-@bot.group()
-async def cool(ctx):
-    """Says if a user is cool.
-    In reality this just checks if a subcommand is being invoked.
-    """
-    if ctx.invoked_subcommand is None:
-        await ctx.send(f'No, {ctx.subcommand_passed} is not cool')
-
-
-@cool.command(name='bot')
-async def _bot(ctx):
-    """Is the bot cool?"""
-    await ctx.send('Yes, the bot is cool.')
-
-
+    coop_str = ''
+    if players > 1:
+        coop_str = '{}-player '.format(players if players<8 else '5-8')
+    
+    reply.title = f'{ranking.capitalize()} leaderboard for {coop_str}{char}'
+    if len(flags_str) > 0:
+        reply.title += f' ({", ".join(flags_str)})'
+    reply.set_thumbnail(url='https://raw.githubusercontent.com/necrommunity/Statsbot/master/icons/{}.png'.format(char).replace(' ','%20'))
+    
+    if len(modes_found) > 0:
+        reply.add_field(name='Modes',
+                    value=', '.join([m.lower().replace('_', ' ') for m in modes_found]).capitalize(), 
+                    inline=False)
+    
+    reply.add_field(name='Results', value=f'```{lbstr}```')
+    await interaction.response.send_message(embed=reply)
 
 with open('config.json') as f:
 	content = json.loads(f.read())
 	token = content['token']
 
-index = category.indexer()
+try:
+    with open('leaderboards.json') as f:
+	    all_lbs = json.loads(f.read())
+except:
+    print('Failed to read leaderboards.json.')
 
-bot.run(token)
+client.run(token)
